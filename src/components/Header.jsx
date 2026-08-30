@@ -1,8 +1,12 @@
+```jsx
+import { useState } from "react";
 import {
   Search,
   UserRound,
   BookOpen,
   Mail,
+  Menu,
+  X,
 } from "lucide-react";
 
 import {
@@ -11,7 +15,10 @@ import {
 } from "react-router-dom";
 
 
-// Simple inline WhatsApp glyph (lucide-react has no official brand icon)
+// =====================================================
+// WHATSAPP ICON
+// =====================================================
+
 function WhatsAppIcon({ size = 15, color = "white" }) {
   return (
     <svg
@@ -28,9 +35,24 @@ function WhatsAppIcon({ size = 15, color = "white" }) {
 }
 
 
+// =====================================================
+// HEADER
+// =====================================================
+
 function Header() {
 
   const navigate = useNavigate();
+
+  const [menuOpen, setMenuOpen] = useState(false);
+
+
+  // =====================================================
+  // CLOSE MOBILE MENU
+  // =====================================================
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
 
 
   // =====================================================
@@ -63,14 +85,22 @@ function Header() {
         style={{
           background: "#171717",
           color: "#f2ede4",
+
           padding: "8px 40px",
+
           display: "flex",
+
           alignItems: "center",
+
           justifyContent: "flex-end",
+
           gap: "24px",
+
           fontSize: "13px",
+
           flexWrap: "wrap",
         }}
+        className="contact-bar"
       >
 
         <a
@@ -89,6 +119,7 @@ function Header() {
           +91 99622 41090
         </a>
 
+
         <a
           href="https://wa.me/919514364459"
           target="_blank"
@@ -104,6 +135,7 @@ function Header() {
           <WhatsAppIcon />
           +91 95143 64459
         </a>
+
 
         <a
           href="mailto:jupitar2602@gmail.com"
@@ -122,9 +154,13 @@ function Header() {
       </div>
 
 
+      {/* =================================================
+          MAIN HEADER
+      ================================================= */}
+
       <header
         style={{
-          height: "90px",
+          minHeight: "90px",
 
           borderBottom:
             "1px solid #e5e1db",
@@ -138,8 +174,13 @@ function Header() {
           justifyContent:
             "space-between",
 
-          padding: "0 40px",
+          padding: "15px 40px",
+
+          position: "relative",
+
+          zIndex: 1000,
         }}
+        className="main-header"
       >
 
 
@@ -149,6 +190,7 @@ function Header() {
 
         <NavLink
           to="/"
+          onClick={closeMenu}
           style={{
             textDecoration: "none",
 
@@ -169,6 +211,8 @@ function Header() {
               width: "54px",
 
               height: "54px",
+
+              minWidth: "54px",
 
               borderRadius: "50%",
 
@@ -228,10 +272,11 @@ function Header() {
 
 
         {/* =================================================
-            NAVIGATION
+            DESKTOP NAVIGATION
         ================================================= */}
 
         <nav
+          className="desktop-navigation"
           style={{
             display: "flex",
 
@@ -243,8 +288,6 @@ function Header() {
           }}
         >
 
-          {/* HOME */}
-
           <NavLink
             to="/"
             style={navStyle}
@@ -252,11 +295,6 @@ function Header() {
             Home
           </NavLink>
 
-
-          {/* BOOKS
-              IMPORTANT:
-              This goes to the SAME Explore page
-          */}
 
           <NavLink
             to="/books"
@@ -266,8 +304,6 @@ function Header() {
           </NavLink>
 
 
-          {/* AUTHORS */}
-
           <NavLink
             to="/authors"
             style={navStyle}
@@ -275,8 +311,6 @@ function Header() {
             Author
           </NavLink>
 
-
-          {/* ABOUT */}
 
           <NavLink
             to="/about"
@@ -290,10 +324,11 @@ function Header() {
 
 
         {/* =================================================
-            RIGHT SIDE
+            DESKTOP RIGHT SIDE
         ================================================= */}
 
         <div
+          className="desktop-actions"
           style={{
             display: "flex",
 
@@ -303,20 +338,14 @@ function Header() {
           }}
         >
 
-
-          {/* =================================================
-              SEARCH BUTTON
-          ================================================= */}
+          {/* SEARCH */}
 
           <button
-            onClick={() =>
-              navigate("/books")
-            }
+            onClick={() => navigate("/books")}
             style={{
               border: "none",
 
-              background:
-                "transparent",
+              background: "transparent",
 
               cursor: "pointer",
 
@@ -340,14 +369,10 @@ function Header() {
 
 
 
-          {/* =================================================
-              LOGIN → USER LOGIN
-          ================================================= */}
+          {/* LOGIN */}
 
           <button
-            onClick={() =>
-              navigate("/login")
-            }
+            onClick={() => navigate("/login")}
 
             style={{
               border: "none",
@@ -383,12 +408,233 @@ function Header() {
 
         </div>
 
+
+
+        {/* =================================================
+            MOBILE ACTIONS
+        ================================================= */}
+
+        <div
+          className="mobile-actions"
+          style={{
+            display: "none",
+
+            alignItems: "center",
+
+            gap: "8px",
+          }}
+        >
+
+          {/* MOBILE SEARCH */}
+
+          <button
+            onClick={() => navigate("/books")}
+
+            style={{
+              border: "none",
+
+              background: "transparent",
+
+              padding: "8px",
+
+              cursor: "pointer",
+
+              display: "flex",
+            }}
+
+            aria-label="Search books"
+          >
+            <Search size={22} />
+          </button>
+
+
+          {/* MOBILE MENU */}
+
+          <button
+            onClick={() =>
+              setMenuOpen(!menuOpen)
+            }
+
+            style={{
+              border: "none",
+
+              background: "transparent",
+
+              padding: "8px",
+
+              cursor: "pointer",
+
+              display: "flex",
+            }}
+
+            aria-label="Open navigation menu"
+          >
+
+            {menuOpen ? (
+              <X size={27} />
+            ) : (
+              <Menu size={27} />
+            )}
+
+          </button>
+
+        </div>
+
       </header>
 
-    </>
 
+
+      {/* =================================================
+          MOBILE MENU
+      ================================================= */}
+
+      {menuOpen && (
+
+        <div
+          className="mobile-menu"
+
+          style={{
+            position: "absolute",
+
+            top: "auto",
+
+            left: 0,
+
+            right: 0,
+
+            background: "#faf7f2",
+
+            borderBottom:
+              "1px solid #ddd",
+
+            boxShadow:
+              "0 10px 25px rgba(0,0,0,0.08)",
+
+            padding: "20px",
+
+            zIndex: 999,
+          }}
+        >
+
+          <nav
+            style={{
+              display: "flex",
+
+              flexDirection: "column",
+
+              gap: "4px",
+            }}
+          >
+
+            <NavLink
+              to="/"
+              onClick={closeMenu}
+              style={{
+                ...navStyle,
+                padding: "15px 10px",
+                fontSize: "17px",
+                borderBottom: "1px solid #e5e1db",
+              }}
+            >
+              Home
+            </NavLink>
+
+
+            <NavLink
+              to="/books"
+              onClick={closeMenu}
+              style={{
+                ...navStyle,
+                padding: "15px 10px",
+                fontSize: "17px",
+                borderBottom: "1px solid #e5e1db",
+              }}
+            >
+              Books
+            </NavLink>
+
+
+            <NavLink
+              to="/authors"
+              onClick={closeMenu}
+              style={{
+                ...navStyle,
+                padding: "15px 10px",
+                fontSize: "17px",
+                borderBottom: "1px solid #e5e1db",
+              }}
+            >
+              Author
+            </NavLink>
+
+
+            <NavLink
+              to="/about"
+              onClick={closeMenu}
+              style={{
+                ...navStyle,
+                padding: "15px 10px",
+                fontSize: "17px",
+                borderBottom: "1px solid #e5e1db",
+              }}
+            >
+              About
+            </NavLink>
+
+
+            {/* MOBILE LOGIN */}
+
+            <button
+              onClick={() => {
+                closeMenu();
+                navigate("/login");
+              }}
+
+              style={{
+                border: "none",
+
+                background: "#171717",
+
+                color: "white",
+
+                borderRadius: "30px",
+
+                padding: "13px 20px",
+
+                fontSize: "15px",
+
+                fontWeight: "600",
+
+                cursor: "pointer",
+
+                display: "flex",
+
+                alignItems: "center",
+
+                justifyContent: "center",
+
+                gap: "8px",
+
+                marginTop: "15px",
+              }}
+            >
+
+              <UserRound size={18} />
+
+              Login
+
+            </button>
+
+          </nav>
+
+        </div>
+
+      )}
+
+    </>
   );
 }
 
 
 export default Header;
+```
