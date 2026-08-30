@@ -1,3 +1,4 @@
+```jsx
 import { useState, useEffect, useRef } from "react";
 import {
   useNavigate,
@@ -20,8 +21,9 @@ import {
 
 import {
   addBook,
+  updateBook,
+  deleteBook,
   getUploadedBooks,
-  saveUploadedBooks,
 } from "../services/booksService";
 
 // =====================================================
@@ -319,7 +321,6 @@ function AddBook() {
   const [bookFile, setBookFile] =
     useState(null);
 
-  // Existing files while editing
   const [existingBookFile, setExistingBookFile] =
     useState(null);
 
@@ -379,10 +380,9 @@ function AddBook() {
   // LOAD BOOKS
   // =====================================================
 
-  const loadBooks = () => {
+  const loadBooks = async () => {
     try {
-      const storedBooks =
-        getUploadedBooks();
+      const storedBooks = await getUploadedBooks();
 
       setBooks(
         Array.isArray(storedBooks)
@@ -467,7 +467,7 @@ function AddBook() {
       fileExtension:
         editBook.fileExtension ||
         "",
-      
+
       fileSize:
         editBook.fileSize ||
         0,
@@ -733,7 +733,6 @@ function AddBook() {
 
     setBookFile(file);
 
-    // New file replaces old file
     setExistingBookFile(null);
 
     setMessage("");
@@ -783,7 +782,10 @@ function AddBook() {
       return;
     }
 
-    if (!bookFile && !existingBookFile) {
+    if (
+      !bookFile &&
+      !existingBookFile
+    ) {
       setMessage(
         "Please upload the book file."
       );
@@ -940,7 +942,8 @@ function AddBook() {
         pdfUrl:
           fileExtension === "pdf"
             ? bookDataUrl
-            : editBook?.pdfUrl || "",
+            : editBook?.pdfUrl ||
+              "",
 
         status:
           editBook?.status ||
@@ -963,26 +966,13 @@ function AddBook() {
       // =================================================
 
       if (isEditMode) {
-        const allBooks =
-          getUploadedBooks();
-
-        const updatedBooks =
-          allBooks.map((book) =>
-            String(book.id) ===
-            String(editBook.id)
-              ? updatedBook
-              : book
-          );
-
-        saveUploadedBooks(
-          updatedBooks
-        );
+        await updateBook(updatedBook);
 
         setMessage(
           "Book updated successfully!"
         );
       } else {
-        addBook(updatedBook);
+        await addBook(updatedBook);
 
         setMessage(
           "Book published successfully!"
@@ -993,7 +983,7 @@ function AddBook() {
       // REFRESH MANAGE LIST
       // =================================================
 
-      loadBooks();
+      await loadBooks();
 
       // =================================================
       // CLEAR EDIT STATE
@@ -1022,7 +1012,6 @@ function AddBook() {
           });
         }
       }, 500);
-
     } catch (error) {
       console.error(
         "Book publishing error:",
@@ -1030,7 +1019,7 @@ function AddBook() {
       );
 
       setMessage(
-        "Unable to save the book. Your browser may not have enough storage for this file."
+        "Unable to save the book. Please check your connection and try again."
       );
     } finally {
       setIsPublishing(false);
@@ -1056,32 +1045,18 @@ function AddBook() {
   // DELETE BOOK
   // =====================================================
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const confirmed =
       window.confirm(
         "Are you sure you want to delete this book?"
       );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
-      const currentBooks =
-        getUploadedBooks();
+      await deleteBook(id);
 
-      const updatedBooks =
-        currentBooks.filter(
-          (book) =>
-            String(book.id) !==
-            String(id)
-        );
-
-      saveUploadedBooks(
-        updatedBooks
-      );
-
-      setBooks(updatedBooks);
+      await loadBooks();
 
       setMessage(
         "Book deleted successfully."
@@ -1139,7 +1114,8 @@ function AddBook() {
           }
           style={{
             display: "flex",
-            alignItems: "center",
+            alignItems:
+              "center",
             gap: "8px",
             border: "none",
             background:
@@ -3140,9 +3116,9 @@ function AddBook() {
           )}
         </section>
 
-        {/* =================================================
+        {/* =====================================================
             BACK TO WEBSITE
-        ================================================= */}
+        ===================================================== */}
 
         <button
           onClick={() =>
@@ -3158,10 +3134,8 @@ function AddBook() {
             border: "none",
             background:
               "transparent",
-            cursor:
-              "pointer",
-            color:
-              "#555",
+            cursor: "pointer",
+            color: "#555",
           }}
         >
           <ArrowLeft
@@ -3175,3 +3149,4 @@ function AddBook() {
 }
 
 export default AddBook;
+```

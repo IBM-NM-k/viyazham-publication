@@ -1,68 +1,150 @@
-const STORAGE_KEY = "viyazham_uploaded_books";
+import { supabase } from "./supabaseClient";
 
-const FAKE_DELAY_MS = 200;
+const TABLE = "books";
+const BUCKET = "vizhayam-publication";
 
 
 // =====================================================
-// DELAY
+// ROW <-> BOOK OBJECT MAPPING
+// (Supabase columns are snake_case, the app uses camelCase)
 // =====================================================
 
-function delay(ms) {
-  return new Promise((resolve) =>
-    setTimeout(resolve, ms)
-  );
+function toRow(book) {
+  return {
+    id: book.id,
+    title: book.title,
+    slug: book.slug,
+    author_name:
+      book.author?.name || book.author || "",
+    category: book.category,
+    language: book.language,
+    pages: book.pages,
+    price: book.price,
+    description: book.description,
+    cover_image_url: book.coverImageUrl,
+    file_url: book.fileUrl,
+    file_name: book.fileName,
+    file_type: book.fileType,
+    file_extension: book.fileExtension,
+    file_size: book.fileSize,
+    pdf_url: book.pdfUrl,
+    status: book.status,
+    featured: book.featured,
+    created_at: book.createdAt,
+    updated_at: book.updatedAt,
+  };
+}
+
+function fromRow(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    author: { name: row.author_name },
+    category: row.category,
+    language: row.language,
+    pages: row.pages,
+    price: row.price,
+    description: row.description,
+    coverImageUrl: row.cover_image_url,
+    coverUrl: row.cover_image_url,
+    fileUrl: row.file_url,
+    fileName: row.file_name,
+    fileType: row.file_type,
+    fileExtension: row.file_extension,
+    fileSize: row.file_size,
+    pdfUrl: row.pdf_url,
+    status: row.status,
+    featured: row.featured,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }
 
 
 // =====================================================
-// GET UPLOADED BOOKS
+// UPLOAD A FRESH FILE TO STORAGE
+// (skips re-uploading if it's already a hosted URL)
 // =====================================================
 
-export function getUploadedBooks() {
-  try {
-    const stored =
-      localStorage.getItem(STORAGE_KEY);
+async function uploadIfDataUrl(dataUrl, folder) {
+  if (!dataUrl || !dataUrl.startsWith("data:")) {
+    return dataUrl || "";
+  }
 
-    if (!stored) {
-      return [];
-    }
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
 
-    const books = JSON.parse(stored);
+  const extension =
+    blob.type.split("/")[1]?.split("+")[0] || "bin";
 
-    return Array.isArray(books)
-      ? books
-      : [];
+  const path = `${folder}/${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}.${extension}`;
 
-  } catch (error) {
+  const { error: uploadError } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, blob, {
+      contentType: blob.type,
+      upsert: false,
+    });
 
-    console.error(
-      "Unable to read uploaded books:",
-      error
-    );
+  if (uploadError) {
+    throw uploadError;
+  }
 
+  const { data } = supabase.storage
+    .from(BUCKET)
+    .getPublicUrl(path);
+
+  return data.publicUrl;
+}
+
+
+// =====================================================
+// GET UPLOADED BOOKS (admin list, all statuses)
+// =====================================================
+
+export async function getUploadedBooks() {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Unable to read uploaded books:", error);
     return [];
   }
+
+  return (data || []).map(fromRow);
 }
 
 
 // =====================================================
 // SAVE BOOKS
+// Kept for compatibility with any other pages calling it.
+// Prefer addBook / updateBook / deleteBook for new code.
 // =====================================================
 
-export function saveUploadedBooks(books) {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(books)
-  );
+export async function saveUploadedBooks(books) {
+  const rows = books.map(toRow);
+
+  const { error } = await supabase
+    .from(TABLE)
+    .upsert(rows, { onConflict: "id" });
+
+  if (error) {
+    console.error("Unable to save books:", error);
+    throw error;
+  }
 }
 
 
 // =====================================================
 // GET ALL BOOKS
-// ONLY ADMIN UPLOADED BOOKS
 // =====================================================
 
-export function getAllBooks() {
+export async function getAllBooks() {
   return getUploadedBooks();
 }
 
@@ -71,40 +153,74 @@ export function getAllBooks() {
 // ADD BOOK
 // =====================================================
 
-export function addBook(book) {
+export async function addBook(book) {
+  const coverImageUrl = await uploadIfDataUrl(
+    book.coverImageUrl,
+    "covers"
+  );
 
-  const uploadedBooks =
-    getUploadedBooks();
+  const fileUrl = await uploadIfDataUrl(
+    book.fileUrl,
+    "files"
+  );
 
-  uploadedBooks.push(book);
+  const finalBook = {
+    ...book,
+    coverImageUrl,
+    fileUrl,
+    pdfUrl:
+      book.fileExtension === "pdf"
+        ? fileUrl
+        : book.pdfUrl || "",
+  };
 
-  saveUploadedBooks(uploadedBooks);
+  const { error } = await supabase
+    .from(TABLE)
+    .insert(toRow(finalBook));
 
-  return book;
+  if (error) {
+    throw error;
+  }
+
+  return finalBook;
 }
 
 
 // =====================================================
 // UPDATE BOOK
-// THIS IS IMPORTANT FOR EDIT
 // =====================================================
 
-export function updateBook(updatedBook) {
+export async function updateBook(updatedBook) {
+  const coverImageUrl = await uploadIfDataUrl(
+    updatedBook.coverImageUrl,
+    "covers"
+  );
 
-  const uploadedBooks =
-    getUploadedBooks();
+  const fileUrl = await uploadIfDataUrl(
+    updatedBook.fileUrl,
+    "files"
+  );
 
-  const updatedBooks =
-    uploadedBooks.map((book) =>
-      String(book.id) ===
-      String(updatedBook.id)
-        ? updatedBook
-        : book
-    );
+  const finalBook = {
+    ...updatedBook,
+    coverImageUrl,
+    fileUrl,
+    pdfUrl:
+      updatedBook.fileExtension === "pdf"
+        ? fileUrl
+        : updatedBook.pdfUrl || "",
+  };
 
-  saveUploadedBooks(updatedBooks);
+  const { error } = await supabase
+    .from(TABLE)
+    .update(toRow(finalBook))
+    .eq("id", updatedBook.id);
 
-  return updatedBook;
+  if (error) {
+    throw error;
+  }
+
+  return finalBook;
 }
 
 
@@ -112,20 +228,17 @@ export function updateBook(updatedBook) {
 // DELETE BOOK
 // =====================================================
 
-export function deleteBook(id) {
+export async function deleteBook(id) {
+  const { error } = await supabase
+    .from(TABLE)
+    .delete()
+    .eq("id", id);
 
-  const uploadedBooks =
-    getUploadedBooks();
+  if (error) {
+    throw error;
+  }
 
-  const updatedBooks =
-    uploadedBooks.filter(
-      (book) =>
-        String(book.id) !== String(id)
-    );
-
-  saveUploadedBooks(updatedBooks);
-
-  return updatedBooks;
+  return getUploadedBooks();
 }
 
 
@@ -134,13 +247,18 @@ export function deleteBook(id) {
 // =====================================================
 
 export async function getPublishedBooks() {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("status", "published")
+    .order("created_at", { ascending: false });
 
-  await delay(FAKE_DELAY_MS);
+  if (error) {
+    console.error(error);
+    return [];
+  }
 
-  return getAllBooks().filter(
-    (book) =>
-      book.status === "published"
-  );
+  return (data || []).map(fromRow);
 }
 
 
@@ -149,14 +267,19 @@ export async function getPublishedBooks() {
 // =====================================================
 
 export async function getFeaturedBooks() {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("status", "published")
+    .eq("featured", true)
+    .order("created_at", { ascending: false });
 
-  await delay(FAKE_DELAY_MS);
+  if (error) {
+    console.error(error);
+    return [];
+  }
 
-  return getAllBooks().filter(
-    (book) =>
-      book.status === "published" &&
-      book.featured === true
-  );
+  return (data || []).map(fromRow);
 }
 
 
@@ -165,14 +288,19 @@ export async function getFeaturedBooks() {
 // =====================================================
 
 export async function getBookById(id) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("id", id)
+    .eq("status", "published")
+    .maybeSingle();
 
-  await delay(FAKE_DELAY_MS);
+  if (error) {
+    console.error(error);
+    return null;
+  }
 
-  return getAllBooks().find(
-    (book) =>
-      String(book.id) === String(id) &&
-      book.status === "published"
-  );
+  return data ? fromRow(data) : null;
 }
 
 
@@ -181,25 +309,23 @@ export async function getBookById(id) {
 // =====================================================
 
 export async function getCategories() {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("category")
+    .eq("status", "published");
 
-  await delay(FAKE_DELAY_MS);
+  if (error) {
+    console.error(error);
+    return [];
+  }
 
-  const published =
-    getAllBooks().filter(
-      (book) =>
-        book.status === "published"
-    );
-
-  const uniqueCategories =
-    new Set(
-      published
-        .map((book) => book.category)
-        .filter(Boolean)
-    );
-
-  return Array.from(
-    uniqueCategories
+  const uniqueCategories = new Set(
+    (data || [])
+      .map((row) => row.category)
+      .filter(Boolean)
   );
+
+  return Array.from(uniqueCategories);
 }
 
 
@@ -211,57 +337,40 @@ export async function searchBooks({
   query = "",
   category = "all",
 } = {}) {
+  let request = supabase
+    .from(TABLE)
+    .select("*")
+    .eq("status", "published");
 
-  await delay(FAKE_DELAY_MS);
+  if (category !== "all") {
+    request = request.eq("category", category);
+  }
 
-  const normalizedQuery =
-    query.trim().toLowerCase();
+  const { data, error } = await request;
 
-  return getAllBooks().filter(
-    (book) => {
+  if (error) {
+    console.error(error);
+    return [];
+  }
 
-      // Only published books
+  const normalizedQuery = query.trim().toLowerCase();
 
-      if (
-        book.status !== "published"
-      ) {
-        return false;
+  return (data || [])
+    .map(fromRow)
+    .filter((book) => {
+      if (normalizedQuery === "") {
+        return true;
       }
 
-
-      // Category
-
-      const matchesCategory =
-        category === "all" ||
-        book.category === category;
-
-
-      // Search
-
-      const title =
-        book.title
-          ?.toLowerCase() || "";
-
+      const title = book.title?.toLowerCase() || "";
       const author =
-        book.author?.name
-          ?.toLowerCase() || "";
-
-      const matchesQuery =
-        normalizedQuery === "" ||
-        title.includes(
-          normalizedQuery
-        ) ||
-        author.includes(
-          normalizedQuery
-        );
-
+        book.author?.name?.toLowerCase() || "";
 
       return (
-        matchesCategory &&
-        matchesQuery
+        title.includes(normalizedQuery) ||
+        author.includes(normalizedQuery)
       );
-    }
-  );
+    });
 }
 
 
@@ -269,16 +378,13 @@ export async function searchBooks({
 // CLEAR ALL UPLOADED BOOKS
 // =====================================================
 
-export function clearUploadedBooks() {
+export async function clearUploadedBooks() {
+  const { error } = await supabase
+    .from(TABLE)
+    .delete()
+    .neq("id", "");
 
-  localStorage.removeItem(
-    STORAGE_KEY
-  );
+  if (error) {
+    throw error;
+  }
 }
-
-
-// =====================================================
-// STORAGE KEY
-// =====================================================
-
-export { STORAGE_KEY };
