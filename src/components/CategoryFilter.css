@@ -1,0 +1,27 @@
+.category-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.category-pill {
+  border: 1px solid #ddd;
+  background: white;
+  color: #555;
+  padding: 9px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-pill:hover {
+  border-color: #171717;
+  color: #171717;
+}
+
+.category-pill.active {
+  background: #171717;
+  border-color: #171717;
+  color: white;
+}

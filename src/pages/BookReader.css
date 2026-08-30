@@ -1,0 +1,41 @@
+.book-reader {
+  min-height: calc(100vh - 90px);
+  background: #eee9e0;
+  padding: 40px 20px 80px;
+}
+
+.book-reader-bar {
+  max-width: 900px;
+  margin: 0 auto 30px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.book-reader-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.book-reader-back:hover {
+  color: #171717;
+}
+
+.book-reader-bar h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: #171717;
+  margin: 0;
+}
+
+.book-reader-content {
+  display: flex;
+  justify-content: center;
+}

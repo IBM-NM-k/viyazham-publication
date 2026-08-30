@@ -1,0 +1,44 @@
+.not-found {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  background: #faf7f2;
+}
+
+.not-found-label {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 90px;
+  color: #ded7cc;
+  margin: 0;
+}
+
+.not-found h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #171717;
+  margin: 10px 0;
+}
+
+.not-found-message {
+  color: #777;
+  margin-bottom: 30px;
+}
+
+.not-found .primary-btn {
+  background: #171717;
+  color: white;
+  border: 1px solid #171717;
+  padding: 14px 26px;
+  border-radius: 30px;
+  font-size: 15px;
+}
+
+.not-found .primary-btn:hover {
+  background: #8b7355;
+  border-color: #8b7355;
+}

@@ -1,0 +1,873 @@
+/* =========================================================
+   VIYAZHAM PUBLICATION — ABOUT PAGE
+   Premium Editorial / Literary Design
+========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@400;500;600;700&display=swap');
+
+:root {
+  --about-bg: #f7f3eb;
+  --about-paper: #fbf9f4;
+  --about-dark: #211c18;
+  --about-text: #514941;
+  --about-muted: #81776d;
+  --about-gold: #a47b3c;
+  --about-gold-light: #c9a86a;
+  --about-line: rgba(33, 28, 24, 0.14);
+  --about-white: #fffdf8;
+}
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+.about-page {
+  width: 100%;
+  overflow: hidden;
+  background: var(--about-bg);
+  color: var(--about-dark);
+  font-family: "DM Sans", sans-serif;
+}
+
+.about-container {
+  width: min(1180px, 90%);
+  margin: 0 auto;
+}
+
+.about-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--about-gold);
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.about-hero {
+  position: relative;
+  min-height: 720px;
+  display: flex;
+  align-items: center;
+  background:
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(164, 123, 60, 0.10),
+      transparent 30%
+    ),
+    var(--about-bg);
+}
+
+.about-hero-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+
+  background-image:
+    linear-gradient(
+      rgba(33, 28, 24, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(33, 28, 24, 0.035) 1px,
+      transparent 1px
+    );
+
+  background-size: 70px 70px;
+}
+
+.about-hero-pattern::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border: 1px solid rgba(164, 123, 60, 0.15);
+  border-radius: 50%;
+  right: -100px;
+  top: 100px;
+}
+
+.about-hero .about-container {
+  position: relative;
+  z-index: 2;
+}
+
+.about-hero-content {
+  max-width: 760px;
+  padding-top: 50px;
+}
+
+.about-hero-content .about-eyebrow {
+  margin-bottom: 28px;
+}
+
+.about-hero h1 {
+  margin: 0;
+  max-width: 850px;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(60px, 8vw, 108px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -4px;
+}
+
+.about-hero h1 span {
+  display: block;
+  color: var(--about-gold);
+  font-style: italic;
+}
+
+.about-hero-content > p {
+  max-width: 580px;
+  margin: 35px 0 0;
+
+  color: var(--about-text);
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.about-scroll {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 60px;
+
+  color: var(--about-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.about-scroll svg {
+  color: var(--about-gold);
+  animation: aboutArrow 1.8s infinite ease-in-out;
+}
+
+@keyframes aboutArrow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+/* Feather */
+
+.about-hero-symbol {
+  position: absolute;
+  right: 2%;
+  top: 50%;
+
+  transform: translateY(-50%) rotate(-12deg);
+
+  color: var(--about-gold);
+  opacity: 0.18;
+
+  animation: featherFloat 5s ease-in-out infinite;
+}
+
+@keyframes featherFloat {
+  0%,
+  100% {
+    transform: translateY(-50%) rotate(-12deg);
+  }
+
+  50% {
+    transform: translateY(calc(-50% - 15px)) rotate(-7deg);
+  }
+}
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.about-introduction {
+  padding: 150px 0;
+  background: var(--about-paper);
+}
+
+.about-intro-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 90px;
+}
+
+.about-section-number {
+  padding-top: 10px;
+
+  color: var(--about-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.about-section-number span {
+  display: block;
+  margin-bottom: 15px;
+
+  color: var(--about-gold);
+  font-family: "Playfair Display", serif;
+  font-size: 38px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.about-section-number div {
+  width: 45px;
+  height: 1px;
+  margin-bottom: 18px;
+
+  background: var(--about-gold);
+}
+
+.about-intro-content {
+  max-width: 780px;
+}
+
+.about-intro-content .about-eyebrow {
+  margin-bottom: 24px;
+}
+
+.about-intro-content h2 {
+  margin: 0 0 30px;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(42px, 5vw, 68px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -2px;
+}
+
+.about-intro-content h2 em {
+  color: var(--about-gold);
+  font-weight: 400;
+}
+
+.about-intro-content p {
+  max-width: 720px;
+  margin: 0 0 22px;
+
+  color: var(--about-text);
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.about-intro-content .about-lead {
+  margin-bottom: 28px;
+
+  color: var(--about-dark);
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   VALUES
+========================================================= */
+
+.about-values {
+  padding: 150px 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #211c18 0%,
+      #2d2721 100%
+    );
+
+  color: var(--about-white);
+}
+
+.about-values-heading {
+  max-width: 700px;
+  margin-bottom: 75px;
+}
+
+.about-values-heading .about-eyebrow {
+  margin-bottom: 22px;
+}
+
+.about-values-heading h2 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(45px, 6vw, 75px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+
+.about-values-heading h2 em {
+  color: var(--about-gold-light);
+  font-style: italic;
+}
+
+.about-values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.about-value-card {
+  min-height: 370px;
+  padding: 38px 30px;
+
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+
+  transition:
+    transform 0.35s ease,
+    background 0.35s ease;
+}
+
+.about-value-card:last-child {
+  border-right: none;
+}
+
+.about-value-card:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.about-value-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+  margin-bottom: 50px;
+
+  border: 1px solid rgba(201, 168, 106, 0.45);
+  border-radius: 50%;
+
+  color: var(--about-gold-light);
+
+  transition:
+    transform 0.35s ease,
+    background 0.35s ease;
+}
+
+.about-value-card:hover .about-value-icon {
+  transform: rotate(8deg);
+  background: rgba(201, 168, 106, 0.1);
+}
+
+.about-value-card > span {
+  display: block;
+  margin-bottom: 14px;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.about-value-card h3 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.about-value-card h4 {
+  margin: 7px 0 25px;
+
+  color: var(--about-gold-light);
+
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.about-value-card p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* =========================================================
+   PHILOSOPHY
+========================================================= */
+
+.about-philosophy {
+  padding: 130px 0;
+
+  background: var(--about-bg);
+}
+
+.philosophy-card {
+  position: relative;
+
+  max-width: 950px;
+  margin: auto;
+  padding: 85px 90px;
+
+  text-align: center;
+
+  background: var(--about-paper);
+
+  border: 1px solid var(--about-line);
+
+  box-shadow:
+    0 25px 70px rgba(33, 28, 24, 0.07);
+}
+
+.philosophy-card::before,
+.philosophy-card::after {
+  content: "";
+  position: absolute;
+
+  width: 35px;
+  height: 35px;
+
+  border-color: var(--about-gold);
+}
+
+.philosophy-card::before {
+  top: 22px;
+  left: 22px;
+
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.philosophy-card::after {
+  right: 22px;
+  bottom: 22px;
+
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.philosophy-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 30px;
+
+  color: var(--about-gold);
+
+  border: 1px solid var(--about-line);
+  border-radius: 50%;
+}
+
+.philosophy-card .about-eyebrow {
+  margin-bottom: 28px;
+}
+
+.philosophy-card blockquote {
+  max-width: 780px;
+  margin: 0 auto 28px;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(25px, 3.5vw, 42px);
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.5px;
+}
+
+.philosophy-card > p {
+  margin: 0;
+
+  color: var(--about-gold);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   READER EXPERIENCE
+========================================================= */
+
+.about-reader {
+  padding: 150px 0;
+
+  background: #eee8dd;
+}
+
+.about-reader-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 120px;
+  align-items: start;
+}
+
+.about-reader h2 {
+  margin: 25px 0 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(55px, 7vw, 90px);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -4px;
+}
+
+.about-reader h2 em {
+  color: var(--about-gold);
+  font-weight: 400;
+}
+
+.about-reader-text {
+  padding-top: 10px;
+}
+
+.about-reader-text > p {
+  max-width: 570px;
+  margin: 0 0 25px;
+
+  color: var(--about-text);
+
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.reader-points {
+  margin-top: 55px;
+
+  border-top: 1px solid var(--about-line);
+}
+
+.reader-points > div {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+
+  padding: 22px 0;
+
+  border-bottom: 1px solid var(--about-line);
+
+  transition: padding-left 0.3s ease;
+}
+
+.reader-points > div:hover {
+  padding-left: 12px;
+}
+
+.reader-points span {
+  color: var(--about-gold);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.reader-points strong {
+  font-family: "Playfair Display", serif;
+  font-size: 21px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   FINAL CTA
+========================================================= */
+
+.about-final {
+  position: relative;
+
+  padding: 160px 0;
+
+  text-align: center;
+
+  background: var(--about-dark);
+
+  color: var(--about-white);
+}
+
+.about-final::before {
+  content: "";
+
+  position: absolute;
+  inset: 25px;
+
+  border: 1px solid rgba(201, 168, 106, 0.15);
+
+  pointer-events: none;
+}
+
+.about-final .about-container {
+  position: relative;
+  z-index: 2;
+}
+
+.about-final-feather {
+  margin-bottom: 35px;
+
+  color: var(--about-gold-light);
+
+  opacity: 0.8;
+}
+
+.about-final .about-eyebrow {
+  display: block;
+  margin-bottom: 25px;
+}
+
+.about-final h2 {
+  margin: 0;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(55px, 7vw, 92px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -3px;
+}
+
+.about-final h2 em {
+  color: var(--about-gold-light);
+  font-style: italic;
+}
+
+.about-final p {
+  margin: 35px 0 0;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 16px;
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .about-hero {
+    min-height: 650px;
+  }
+
+  .about-hero-symbol {
+    right: -20px;
+    opacity: 0.1;
+  }
+
+  .about-intro-grid {
+    grid-template-columns: 150px 1fr;
+    gap: 50px;
+  }
+
+  .about-values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-value-card:nth-child(2) {
+    border-right: none;
+  }
+
+  .about-value-card:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .about-reader-grid {
+    gap: 70px;
+  }
+
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .about-container {
+    width: min(92%, 550px);
+  }
+
+  /* HERO */
+
+  .about-hero {
+    min-height: 650px;
+  }
+
+  .about-hero-content {
+    padding-top: 30px;
+  }
+
+  .about-hero-content .about-eyebrow {
+    margin-bottom: 22px;
+  }
+
+  .about-hero h1 {
+    font-size: clamp(52px, 15vw, 78px);
+    letter-spacing: -2.5px;
+  }
+
+  .about-hero-content > p {
+    margin-top: 28px;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .about-scroll {
+    margin-top: 45px;
+  }
+
+  .about-hero-symbol {
+    right: -35px;
+    top: 75%;
+    transform: rotate(-15deg);
+  }
+
+  /* INTRO */
+
+  .about-introduction {
+    padding: 90px 0;
+  }
+
+  .about-intro-grid {
+    display: block;
+  }
+
+  .about-section-number {
+    margin-bottom: 45px;
+  }
+
+  .about-intro-content h2 {
+    font-size: 43px;
+    letter-spacing: -1.5px;
+  }
+
+  .about-intro-content .about-lead {
+    font-size: 20px;
+  }
+
+  /* VALUES */
+
+  .about-values {
+    padding: 90px 0;
+  }
+
+  .about-values-heading {
+    margin-bottom: 50px;
+  }
+
+  .about-values-heading h2 {
+    font-size: 46px;
+  }
+
+  .about-values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-value-card,
+  .about-value-card:nth-child(2) {
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .about-value-card:last-child {
+    border-bottom: none;
+  }
+
+  /* PHILOSOPHY */
+
+  .about-philosophy {
+    padding: 90px 0;
+  }
+
+  .philosophy-card {
+    padding: 65px 25px;
+  }
+
+  .philosophy-card blockquote {
+    font-size: 24px;
+    line-height: 1.6;
+  }
+
+  /* READER */
+
+  .about-reader {
+    padding: 90px 0;
+  }
+
+  .about-reader-grid {
+    display: block;
+  }
+
+  .about-reader h2 {
+    margin-bottom: 60px;
+    font-size: 65px;
+    letter-spacing: -2px;
+  }
+
+  .about-reader-text > p {
+    font-size: 15px;
+  }
+
+  /* FINAL */
+
+  .about-final {
+    padding: 110px 0;
+  }
+
+  .about-final::before {
+    inset: 15px;
+  }
+
+  .about-final h2 {
+    font-size: 57px;
+    letter-spacing: -2px;
+  }
+
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+  .about-hero {
+    min-height: 600px;
+  }
+
+  .about-hero h1 {
+    font-size: 49px;
+  }
+
+  .about-intro-content h2 {
+    font-size: 38px;
+  }
+
+  .about-values-heading h2 {
+    font-size: 40px;
+  }
+
+  .about-reader h2 {
+    font-size: 55px;
+  }
+
+  .about-final h2 {
+    font-size: 48px;
+  }
+
+  .philosophy-card blockquote {
+    font-size: 21px;
+  }
+
+}
