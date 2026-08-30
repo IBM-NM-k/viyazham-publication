@@ -1,4 +1,4 @@
-```jsx
+
 import { useState, useEffect, useRef } from "react";
 import {
   useNavigate,
@@ -869,11 +869,10 @@ function AddBook() {
       // =================================================
 
       const bookId =
-        editBook?.id ||
-        `uploaded-${Date.now()}-${Math.random()
-          .toString(36)
-          .substring(2, 8)}`;
-
+  editBook?.id ||
+  `uploaded-${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(2, 8)}`;
       // =================================================
       // SLUG
       // =================================================
@@ -1003,7 +1002,7 @@ function AddBook() {
       setTimeout(() => {
         const manageSection =
           document.getElementById(
-            "manage-books"
+            "manage-books",
           );
 
         if (manageSection) {
@@ -3149,4 +3148,3 @@ function AddBook() {
 }
 
 export default AddBook;
-```
