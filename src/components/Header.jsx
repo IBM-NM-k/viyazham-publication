@@ -1,5 +1,4 @@
-```jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   UserRound,
@@ -49,6 +48,18 @@ function Header() {
   const closeMenu = () => {
     setMobileMenuOpen(false);
   };
+
+  // Close the mobile menu automatically if the window is resized
+  // back up to desktop width, so it never gets stuck open.
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // =====================================================
   // NAVIGATION STYLE
@@ -196,7 +207,8 @@ function Header() {
         <button
           className="mobile-menu-button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Open menu"
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? (
             <X size={27} />
@@ -266,4 +278,3 @@ function Header() {
 }
 
 export default Header;
-```

@@ -1,0 +1,286 @@
+/* =====================================================
+   VIYAZHAM PUBLICATION — HEADER
+   Palette: oxblood leather + gold foil + warm ivory
+   ===================================================== */
+
+:root {
+  --ink: #2b211b;
+  --oxblood: #6b1e23;
+  --oxblood-dark: #501619;
+  --gold: #c08a2e;
+  --ivory: #fffdf8;
+  --border-soft: rgba(43, 33, 27, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   TOP CONTACT BAR
+   ===================================================== */
+
+.top-contact-bar {
+  background: var(--oxblood-dark);
+  color: var(--ivory);
+  padding: 6px 32px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+}
+
+.contact-items {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ivory);
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.15s ease;
+}
+
+.contact-link:hover {
+  opacity: 1;
+  color: var(--gold);
+}
+
+/* =====================================================
+   MAIN HEADER
+   ===================================================== */
+
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 32px;
+  background: var(--ivory);
+  border-bottom: 1px solid var(--border-soft);
+  font-family: "Inter", system-ui, sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* LOGO */
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--oxblood);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.logo-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.logo-subtitle {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* DESKTOP NAVIGATION */
+
+.desktop-navigation {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-size: 15px;
+}
+
+.desktop-navigation a {
+  position: relative;
+  padding: 4px 0;
+}
+
+.desktop-navigation a:hover {
+  color: var(--oxblood) !important;
+}
+
+/* RIGHT SIDE ACTIONS */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.search-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.search-button:hover {
+  background: var(--oxblood);
+  color: var(--ivory);
+  border-color: var(--oxblood);
+}
+
+.login-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  border: none;
+  background: var(--oxblood);
+  color: var(--ivory);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.login-button:hover {
+  background: var(--oxblood-dark);
+  transform: translateY(-1px);
+}
+
+/* MOBILE MENU BUTTON — hidden on desktop */
+
+.mobile-menu-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* =====================================================
+   MOBILE NAVIGATION PANEL
+   ===================================================== */
+
+.mobile-navigation {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 24px 24px;
+  background: var(--ivory);
+  border-bottom: 1px solid var(--border-soft);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.mobile-navigation a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  font-size: 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.mobile-navigation a:last-of-type {
+  border-bottom: none;
+}
+
+.mobile-login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--oxblood);
+  color: var(--ivory);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* =====================================================
+   RESPONSIVE BREAKPOINT — 768px
+   Matches the resize check in Header.jsx
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+  .top-contact-bar {
+    padding: 6px 16px;
+  }
+
+  .contact-items {
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .contact-link span {
+    display: none; /* icon-only on small screens to save space */
+  }
+
+  .main-header {
+    padding: 12px 16px;
+  }
+
+  .desktop-navigation,
+  .header-actions {
+    display: none; /* replaced by mobile menu + button below */
+  }
+
+  .mobile-menu-button {
+    display: flex;
+  }
+
+  .mobile-navigation {
+    display: flex;
+  }
+
+  .logo-title {
+    font-size: 17px;
+  }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .login-button,
+  .contact-link {
+    transition: none;
+  }
+}
