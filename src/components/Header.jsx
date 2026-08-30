@@ -9,11 +9,9 @@ import {
   X,
 } from "lucide-react";
 
-import {
-  NavLink,
-  useNavigate,
-} from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
+import "./Header.css";
 
 // =====================================================
 // WHATSAPP ICON
@@ -29,31 +27,28 @@ function WhatsAppIcon({ size = 15, color = "white" }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+
       <path d="M12.04 2c-5.522 0-10 4.477-10 10 0 1.765.462 3.489 1.34 5.007L2 22l5.117-1.342A9.958 9.958 0 0012.04 22c5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.166c-1.632 0-3.233-.44-4.628-1.271l-.332-.197-3.037.797.81-2.96-.216-.304A8.128 8.128 0 013.874 12c0-4.5 3.665-8.166 8.166-8.166 4.5 0 8.166 3.665 8.166 8.166 0 4.501-3.665 8.166-8.166 8.166z" />
     </svg>
   );
 }
-
 
 // =====================================================
 // HEADER
 // =====================================================
 
 function Header() {
-
   const navigate = useNavigate();
 
-  const [menuOpen, setMenuOpen] = useState(false);
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // =====================================================
   // CLOSE MOBILE MENU
   // =====================================================
 
   const closeMenu = () => {
-    setMenuOpen(false);
+    setMobileMenuOpen(false);
   };
-
 
   // =====================================================
   // NAVIGATION STYLE
@@ -61,128 +56,57 @@ function Header() {
 
   const navStyle = ({ isActive }) => ({
     textDecoration: "none",
-
-    color: isActive
-      ? "#111"
-      : "#555",
-
-    fontWeight: isActive
-      ? "600"
-      : "400",
-
-    transition: "0.2s",
+    color: isActive ? "#111" : "#555",
+    fontWeight: isActive ? "600" : "400",
   });
-
 
   return (
     <>
-
       {/* =================================================
           TOP CONTACT BAR
       ================================================= */}
 
-      <div
-        style={{
-          background: "#171717",
-          color: "#f2ede4",
+      <div className="top-contact-bar">
 
-          padding: "8px 40px",
+        <div className="contact-items">
 
-          display: "flex",
+          <a
+            href="https://wa.me/919962241090"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="contact-link"
+          >
+            <WhatsAppIcon />
+            <span>+91 99622 41090</span>
+          </a>
 
-          alignItems: "center",
+          <a
+            href="https://wa.me/919514364459"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="contact-link"
+          >
+            <WhatsAppIcon />
+            <span>+91 95143 64459</span>
+          </a>
 
-          justifyContent: "flex-end",
+          <a
+            href="mailto:jupitar2602@gmail.com"
+            className="contact-link"
+          >
+            <Mail size={15} />
+            <span>jupitar2602@gmail.com</span>
+          </a>
 
-          gap: "24px",
-
-          fontSize: "13px",
-
-          flexWrap: "wrap",
-        }}
-        className="contact-bar"
-      >
-
-        <a
-          href="https://wa.me/919962241090"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            color: "#f2ede4",
-            textDecoration: "none",
-          }}
-        >
-          <WhatsAppIcon />
-          +91 99622 41090
-        </a>
-
-
-        <a
-          href="https://wa.me/919514364459"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            color: "#f2ede4",
-            textDecoration: "none",
-          }}
-        >
-          <WhatsAppIcon />
-          +91 95143 64459
-        </a>
-
-
-        <a
-          href="mailto:jupitar2602@gmail.com"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            color: "#f2ede4",
-            textDecoration: "none",
-          }}
-        >
-          <Mail size={15} />
-          jupitar2602@gmail.com
-        </a>
+        </div>
 
       </div>
-
 
       {/* =================================================
           MAIN HEADER
       ================================================= */}
 
-      <header
-        style={{
-          minHeight: "90px",
-
-          borderBottom:
-            "1px solid #e5e1db",
-
-          background: "#faf7f2",
-
-          display: "flex",
-
-          alignItems: "center",
-
-          justifyContent:
-            "space-between",
-
-          padding: "15px 40px",
-
-          position: "relative",
-
-          zIndex: 1000,
-        }}
-        className="main-header"
-      >
-
+      <header className="main-header">
 
         {/* =================================================
             LOGO
@@ -190,78 +114,21 @@ function Header() {
 
         <NavLink
           to="/"
+          className="logo-container"
           onClick={closeMenu}
-          style={{
-            textDecoration: "none",
-
-            color: "#171717",
-
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: "14px",
-          }}
         >
 
-          {/* LOGO ICON */}
-
-          <div
-            style={{
-              width: "54px",
-
-              height: "54px",
-
-              minWidth: "54px",
-
-              borderRadius: "50%",
-
-              background: "#171717",
-
-              display: "flex",
-
-              alignItems: "center",
-
-              justifyContent: "center",
-            }}
-          >
-
-            <BookOpen
-              color="white"
-              size={27}
-            />
-
+          <div className="logo-icon">
+            <BookOpen color="white" size={27} />
           </div>
 
+          <div className="logo-text">
 
-          {/* LOGO TEXT */}
-
-          <div>
-
-            <div
-              style={{
-                fontSize: "23px",
-
-                fontWeight: "700",
-
-                letterSpacing: "0.5px",
-              }}
-            >
+            <div className="logo-title">
               VIYAZHAM
             </div>
 
-
-            <div
-              style={{
-                fontSize: "13px",
-
-                letterSpacing: "3px",
-
-                color: "#777",
-
-                marginTop: "2px",
-              }}
-            >
+            <div className="logo-subtitle">
               PUBLICATION
             </div>
 
@@ -269,372 +136,134 @@ function Header() {
 
         </NavLink>
 
-
-
         {/* =================================================
             DESKTOP NAVIGATION
         ================================================= */}
 
-        <nav
-          className="desktop-navigation"
-          style={{
-            display: "flex",
+        <nav className="desktop-navigation">
 
-            gap: "24px",
-
-            alignItems: "center",
-
-            fontSize: "16px",
-          }}
-        >
-
-          <NavLink
-            to="/"
-            style={navStyle}
-          >
+          <NavLink to="/" style={navStyle}>
             Home
           </NavLink>
 
-
-          <NavLink
-            to="/books"
-            style={navStyle}
-          >
+          <NavLink to="/books" style={navStyle}>
             Books
           </NavLink>
 
-
-          <NavLink
-            to="/authors"
-            style={navStyle}
-          >
+          <NavLink to="/authors" style={navStyle}>
             Author
           </NavLink>
 
-
-          <NavLink
-            to="/about"
-            style={navStyle}
-          >
+          <NavLink to="/about" style={navStyle}>
             About
           </NavLink>
 
         </nav>
 
-
-
         {/* =================================================
-            DESKTOP RIGHT SIDE
+            RIGHT SIDE
         ================================================= */}
 
-        <div
-          className="desktop-actions"
-          style={{
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: "20px",
-          }}
-        >
+        <div className="header-actions">
 
           {/* SEARCH */}
 
           <button
+            className="search-button"
             onClick={() => navigate("/books")}
-            style={{
-              border: "none",
-
-              background: "transparent",
-
-              cursor: "pointer",
-
-              display: "flex",
-
-              alignItems: "center",
-
-              justifyContent: "center",
-
-              padding: "8px",
-            }}
-
             aria-label="Search books"
-
             title="Search Books"
           >
-
-            <Search size={24} />
-
+            <Search size={23} />
           </button>
-
-
 
           {/* LOGIN */}
 
           <button
+            className="login-button"
             onClick={() => navigate("/login")}
-
-            style={{
-              border: "none",
-
-              background: "#171717",
-
-              color: "white",
-
-              borderRadius: "30px",
-
-              padding:
-                "13px 20px",
-
-              fontSize: "15px",
-
-              fontWeight: "600",
-
-              cursor: "pointer",
-
-              display: "flex",
-
-              alignItems: "center",
-
-              gap: "8px",
-            }}
           >
-
             <UserRound size={18} />
-
-            Login
-
+            <span>Login</span>
           </button>
 
         </div>
-
-
 
         {/* =================================================
-            MOBILE ACTIONS
+            MOBILE MENU BUTTON
         ================================================= */}
 
-        <div
-          className="mobile-actions"
-          style={{
-            display: "none",
-
-            alignItems: "center",
-
-            gap: "8px",
-          }}
+        <button
+          className="mobile-menu-button"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Open menu"
         >
-
-          {/* MOBILE SEARCH */}
-
-          <button
-            onClick={() => navigate("/books")}
-
-            style={{
-              border: "none",
-
-              background: "transparent",
-
-              padding: "8px",
-
-              cursor: "pointer",
-
-              display: "flex",
-            }}
-
-            aria-label="Search books"
-          >
-            <Search size={22} />
-          </button>
-
-
-          {/* MOBILE MENU */}
-
-          <button
-            onClick={() =>
-              setMenuOpen(!menuOpen)
-            }
-
-            style={{
-              border: "none",
-
-              background: "transparent",
-
-              padding: "8px",
-
-              cursor: "pointer",
-
-              display: "flex",
-            }}
-
-            aria-label="Open navigation menu"
-          >
-
-            {menuOpen ? (
-              <X size={27} />
-            ) : (
-              <Menu size={27} />
-            )}
-
-          </button>
-
-        </div>
+          {mobileMenuOpen ? (
+            <X size={27} />
+          ) : (
+            <Menu size={27} />
+          )}
+        </button>
 
       </header>
 
-
-
       {/* =================================================
-          MOBILE MENU
+          MOBILE NAVIGATION
       ================================================= */}
 
-      {menuOpen && (
+      {mobileMenuOpen && (
+        <div className="mobile-navigation">
 
-        <div
-          className="mobile-menu"
+          <NavLink
+            to="/"
+            style={navStyle}
+            onClick={closeMenu}
+          >
+            Home
+          </NavLink>
 
-          style={{
-            position: "absolute",
+          <NavLink
+            to="/books"
+            style={navStyle}
+            onClick={closeMenu}
+          >
+            <BookOpen size={18} />
+            Books
+          </NavLink>
 
-            top: "auto",
+          <NavLink
+            to="/authors"
+            style={navStyle}
+            onClick={closeMenu}
+          >
+            Author
+          </NavLink>
 
-            left: 0,
+          <NavLink
+            to="/about"
+            style={navStyle}
+            onClick={closeMenu}
+          >
+            About
+          </NavLink>
 
-            right: 0,
-
-            background: "#faf7f2",
-
-            borderBottom:
-              "1px solid #ddd",
-
-            boxShadow:
-              "0 10px 25px rgba(0,0,0,0.08)",
-
-            padding: "20px",
-
-            zIndex: 999,
-          }}
-        >
-
-          <nav
-            style={{
-              display: "flex",
-
-              flexDirection: "column",
-
-              gap: "4px",
+          <button
+            className="mobile-login-button"
+            onClick={() => {
+              closeMenu();
+              navigate("/login");
             }}
           >
-
-            <NavLink
-              to="/"
-              onClick={closeMenu}
-              style={{
-                ...navStyle,
-                padding: "15px 10px",
-                fontSize: "17px",
-                borderBottom: "1px solid #e5e1db",
-              }}
-            >
-              Home
-            </NavLink>
-
-
-            <NavLink
-              to="/books"
-              onClick={closeMenu}
-              style={{
-                ...navStyle,
-                padding: "15px 10px",
-                fontSize: "17px",
-                borderBottom: "1px solid #e5e1db",
-              }}
-            >
-              Books
-            </NavLink>
-
-
-            <NavLink
-              to="/authors"
-              onClick={closeMenu}
-              style={{
-                ...navStyle,
-                padding: "15px 10px",
-                fontSize: "17px",
-                borderBottom: "1px solid #e5e1db",
-              }}
-            >
-              Author
-            </NavLink>
-
-
-            <NavLink
-              to="/about"
-              onClick={closeMenu}
-              style={{
-                ...navStyle,
-                padding: "15px 10px",
-                fontSize: "17px",
-                borderBottom: "1px solid #e5e1db",
-              }}
-            >
-              About
-            </NavLink>
-
-
-            {/* MOBILE LOGIN */}
-
-            <button
-              onClick={() => {
-                closeMenu();
-                navigate("/login");
-              }}
-
-              style={{
-                border: "none",
-
-                background: "#171717",
-
-                color: "white",
-
-                borderRadius: "30px",
-
-                padding: "13px 20px",
-
-                fontSize: "15px",
-
-                fontWeight: "600",
-
-                cursor: "pointer",
-
-                display: "flex",
-
-                alignItems: "center",
-
-                justifyContent: "center",
-
-                gap: "8px",
-
-                marginTop: "15px",
-              }}
-            >
-
-              <UserRound size={18} />
-
-              Login
-
-            </button>
-
-          </nav>
+            <UserRound size={18} />
+            Login
+          </button>
 
         </div>
-
       )}
 
     </>
   );
 }
-
 
 export default Header;
 ```
