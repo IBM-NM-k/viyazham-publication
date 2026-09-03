@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,6 +11,10 @@ import {
   X,
   Eye,
 } from "lucide-react";
+
+// IMPORTANT:
+// Change this path only if your booksService.js is located somewhere else.
+import { getAllBooks } from "../services/booksService";
 
 const BOOKS_KEY = "viyazham_uploaded_books";
 
@@ -80,22 +85,50 @@ function UserDashboard() {
   }, [navigate]);
 
   // =====================================================
-  // LOAD BOOKS
+  // LOAD BOOKS FROM SUPABASE
   // =====================================================
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(BOOKS_KEY);
-      const parsed = stored ? JSON.parse(stored) : [];
+    let mounted = true;
 
-      setBooks(
-        Array.isArray(parsed)
-          ? parsed.slice(-8).reverse()
-          : []
-      );
-    } catch {
-      setBooks([]);
-    }
+    const loadBooks = async () => {
+      try {
+        const data = await getAllBooks();
+
+        if (!mounted) return;
+
+        // Only show published books
+        const publishedBooks = Array.isArray(data)
+          ? data.filter(
+              (book) =>
+                book.status === "published" ||
+                !book.status
+            )
+          : [];
+
+        // Show latest 8 books
+        setBooks(
+          publishedBooks
+            .slice(-8)
+            .reverse()
+        );
+      } catch (error) {
+        console.error(
+          "Failed to load books from Supabase:",
+          error
+        );
+
+        if (mounted) {
+          setBooks([]);
+        }
+      }
+    };
+
+    loadBooks();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // =====================================================
@@ -224,7 +257,6 @@ Thank you.`;
         color: "#171717",
       }}
     >
-
       <div
         style={{
           maxWidth: "1200px",
@@ -246,7 +278,6 @@ Thank you.`;
             flexWrap: "wrap",
           }}
         >
-
           <div>
 
             <div
@@ -1098,10 +1129,8 @@ Thank you.`;
                 background: "#e7f7ed",
                 color: "#168c45",
                 display: "flex",
-                alignItems:
-                  "center",
-                justifyContent:
-                  "center",
+                alignItems: "center",
+                justifyContent: "center",
                 marginBottom: "18px",
               }}
             >
