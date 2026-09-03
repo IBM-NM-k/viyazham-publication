@@ -1,85 +1,64 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  UserRound,
-  Lock,
-  BookOpen,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Lock, BookOpen, Eye, EyeOff } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
 
-function AdminLogin() {
+function ResetPassword() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
 
     setError("");
+    setMessage("");
 
-    const cleanEmail = email.trim().toLowerCase();
+    if (!password || !confirmPassword) {
+      setError("Please fill in all fields");
+      return;
+    }
 
-    if (!cleanEmail || !password) {
-      setError("Please enter your email and password");
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
 
     setLoading(true);
 
-    try {
-      const { data, error } =
-        await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password,
-        });
+    const { error } = await supabase.auth.updateUser({
+      password,
+    });
 
-      if (error) {
-        setError("Invalid admin email or password");
-        return;
-      }
-
-      if (!data?.user) {
-        setError("Unable to authenticate admin");
-        return;
-      }
-
-      /*
-       * IMPORTANT:
-       * For now this checks the email of the admin account.
-       *
-       * Replace this email with the actual admin email
-       * that you create in Supabase Authentication.
-       */
-      const ADMIN_EMAIL = "your-admin-email@gmail.com";
-
-      if (data.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-        await supabase.auth.signOut();
-
-        setError("You are not authorized to access the admin area");
-        return;
-      }
-
-      /*
-       * Keep this localStorage value because your existing
-       * Admin pages may already use it.
-       */
-      localStorage.setItem("adminLoggedIn", "true");
-
-      navigate("/admin");
-    } catch (err) {
-      console.error("Admin login error:", err);
-      setError("Something went wrong. Please try again.");
-    } finally {
+    if (error) {
+      setError(error.message);
       setLoading(false);
+      return;
     }
+
+    setMessage("Your password has been updated successfully.");
+
+    setPassword("");
+    setConfirmPassword("");
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
+
+    setLoading(false);
   };
 
   return (
@@ -104,8 +83,7 @@ function AdminLogin() {
           boxShadow: "0 15px 40px rgba(0,0,0,0.08)",
         }}
       >
-        {/* HEADER */}
-
+        {/* LOGO */}
         <div
           style={{
             textAlign: "center",
@@ -134,7 +112,7 @@ function AdminLogin() {
               color: "#171717",
             }}
           >
-            Admin Login
+            Reset Password
           </h1>
 
           <p
@@ -147,59 +125,9 @@ function AdminLogin() {
           </p>
         </div>
 
-        {/* FORM */}
-
-        <form onSubmit={handleLogin}>
-          {/* EMAIL */}
-
-          <label
-            style={{
-              fontSize: "14px",
-              fontWeight: "500",
-            }}
-          >
-            Admin Email
-          </label>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "0 12px",
-              marginTop: "8px",
-              marginBottom: "20px",
-            }}
-          >
-            <UserRound size={19} color="#777" />
-
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter admin email"
-              autoComplete="email"
-              style={{
-                width: "100%",
-                border: "none",
-                outline: "none",
-                padding: "14px 10px",
-                fontSize: "15px",
-              }}
-            />
-          </div>
-
-          {/* PASSWORD */}
-
-          <label
-            style={{
-              fontSize: "14px",
-              fontWeight: "500",
-            }}
-          >
-            Password
-          </label>
+        <form onSubmit={handleResetPassword}>
+          {/* NEW PASSWORD */}
+          <label>New Password</label>
 
           <div
             style={{
@@ -218,8 +146,58 @@ function AdminLogin() {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
-              autoComplete="current-password"
+              placeholder="Enter new password"
+              style={{
+                width: "100%",
+                border: "none",
+                outline: "none",
+                padding: "14px 10px",
+                fontSize: "15px",
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+                padding: "5px",
+                display: "flex",
+              }}
+            >
+              {showPassword ? (
+                <EyeOff size={19} color="#777" />
+              ) : (
+                <Eye size={19} color="#777" />
+              )}
+            </button>
+          </div>
+
+          {/* CONFIRM PASSWORD */}
+          <label>Confirm Password</label>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              padding: "0 12px",
+              marginTop: "8px",
+              marginBottom: "20px",
+            }}
+          >
+            <Lock size={19} color="#777" />
+
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) =>
+                setConfirmPassword(e.target.value)
+              }
+              placeholder="Confirm new password"
               style={{
                 width: "100%",
                 border: "none",
@@ -232,81 +210,95 @@ function AdminLogin() {
             <button
               type="button"
               onClick={() =>
-                setShowPassword(!showPassword)
+                setShowConfirmPassword(!showConfirmPassword)
               }
               style={{
                 border: "none",
                 background: "transparent",
                 cursor: "pointer",
-                color: "#777",
+                padding: "5px",
                 display: "flex",
-                alignItems: "center",
               }}
             >
-              {showPassword ? (
-                <EyeOff size={19} />
+              {showConfirmPassword ? (
+                <EyeOff size={19} color="#777" />
               ) : (
-                <Eye size={19} />
+                <Eye size={19} color="#777" />
               )}
             </button>
           </div>
 
           {/* ERROR */}
-
           {error && (
-            <div
+            <p
               style={{
                 color: "#c0392b",
-                background: "#fff3f2",
-                border: "1px solid #f2c7c3",
-                padding: "11px 12px",
-                borderRadius: "8px",
-                fontSize: "13px",
+                fontSize: "14px",
                 marginBottom: "15px",
               }}
             >
               {error}
-            </div>
+            </p>
           )}
 
-          {/* LOGIN BUTTON */}
+          {/* SUCCESS */}
+          {message && (
+            <p
+              style={{
+                color: "#278a52",
+                fontSize: "14px",
+                marginBottom: "15px",
+              }}
+            >
+              {message}
+            </p>
+          )}
 
+          {/* BUTTON */}
           <button
             type="submit"
             disabled={loading}
             style={{
               width: "100%",
               border: "none",
-              background: "#171717",
+              background: loading ? "#777" : "#171717",
               color: "white",
               padding: "15px",
               borderRadius: "10px",
               fontSize: "16px",
               fontWeight: "600",
               cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? "Signing in..." : "Login"}
+            {loading ? "Updating..." : "Update Password"}
           </button>
         </form>
 
-        {/* FOOTER */}
-
+        {/* BACK TO LOGIN */}
         <p
           style={{
             textAlign: "center",
             marginTop: "20px",
-            color: "#999",
-            fontSize: "13px",
+            color: "#555",
+            fontSize: "14px",
           }}
         >
-          🔒 Admin access only
+          Remember your password?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            style={{
+              color: "#171717",
+              fontWeight: "600",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            Login
+          </span>
         </p>
       </div>
     </div>
   );
 }
 
-export default AdminLogin;
-
+export default ResetPassword;

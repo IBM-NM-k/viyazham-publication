@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import AdminProtectedRoute from "./components/AdminProtectedRoute.jsx";
 
 import Home from "./pages/Home.jsx";
 import Explore from "./pages/Explore.jsx";
@@ -13,6 +15,8 @@ import NotFound from "./pages/NotFound.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import UserAuth from "./pages/UserAuth.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+
 import Admin from "./pages/Admin.jsx";
 import AddBook from "./pages/AddBook.jsx";
 
@@ -27,7 +31,9 @@ function App() {
 
       <Route element={<Layout />}>
 
-        {/* HOME */}
+        {/* =================================================
+            HOME
+        ================================================= */}
 
         <Route
           path="/"
@@ -37,14 +43,6 @@ function App() {
 
         {/* =================================================
             BOOKS / EXPLORE
-
-            This is the ONE books page.
-
-            Header → Books
-            Home → Explore Books
-            Search → Books
-
-            All go to /books
         ================================================= */}
 
         <Route
@@ -94,7 +92,7 @@ function App() {
 
 
         {/* =================================================
-            USER LOGIN
+            USER LOGIN / SIGNUP
         ================================================= */}
 
         <Route
@@ -104,12 +102,28 @@ function App() {
 
 
         {/* =================================================
-            USER UPDATES (shown after user login)
+            RESET PASSWORD
+        ================================================= */}
+
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
+        />
+
+
+        {/* =================================================
+            USER DASHBOARD
+
+            Only logged-in users can access this.
         ================================================= */}
 
         <Route
           path="/user-updates"
-          element={<UserDashboard />}
+          element={
+            <ProtectedRoute>
+              <UserDashboard />
+            </ProtectedRoute>
+          }
         />
 
 
@@ -125,21 +139,33 @@ function App() {
 
         {/* =================================================
             ADMIN DASHBOARD
+
+            Only the configured admin email can access.
         ================================================= */}
 
         <Route
           path="/admin"
-          element={<Admin />}
+          element={
+            <AdminProtectedRoute>
+              <Admin />
+            </AdminProtectedRoute>
+          }
         />
 
 
         {/* =================================================
             ADD / UPLOAD BOOK
+
+            Only the configured admin can access.
         ================================================= */}
 
         <Route
           path="/admin/books/add"
-          element={<AddBook />}
+          element={
+            <AdminProtectedRoute>
+              <AddBook />
+            </AdminProtectedRoute>
+          }
         />
 
 
@@ -153,7 +179,9 @@ function App() {
         />
 
 
-        {/* ANY UNKNOWN URL */}
+        {/* =================================================
+            ANY UNKNOWN URL
+        ================================================= */}
 
         <Route
           path="*"
