@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UserAuth.css";
 
@@ -35,26 +35,7 @@ const USER_DASHBOARD = "/userdashboard";
 
 function UserAuth() {
   const navigate = useNavigate();
-  useEffect(() => {
-  const checkSession = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session?.user) return;
-
-    const email = session.user.email?.trim().toLowerCase();
-
-    if (email === ADMIN_EMAIL.toLowerCase()) {
-      navigate("/admin", { replace: true });
-    } else {
-      navigate("/userdashboard", { replace: true });
-    }
-  };
-
-  checkSession();
-}, [navigate]);
-
+  
   // ======================================================
   // STATES
   // ======================================================
