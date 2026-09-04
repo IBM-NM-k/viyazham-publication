@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UserAuth.css";
 
@@ -35,6 +35,25 @@ const USER_DASHBOARD = "/userdashboard";
 
 function UserAuth() {
   const navigate = useNavigate();
+  useEffect(() => {
+  const checkSession = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) return;
+
+    const email = session.user.email?.trim().toLowerCase();
+
+    if (email === ADMIN_EMAIL.toLowerCase()) {
+      navigate("/admin", { replace: true });
+    } else {
+      navigate("/userdashboard", { replace: true });
+    }
+  };
+
+  checkSession();
+}, [navigate]);
 
   // ======================================================
   // STATES
@@ -235,67 +254,37 @@ function UserAuth() {
   // ======================================================
   // GOOGLE LOGIN
   // ======================================================
+const handleGoogleLogin = async () => {
+  try {
+    setError("");
+    setMessage("");
+    setGoogleLoading(true);
 
-  const handleGoogleLogin = async () => {
-    try {
-      setError("");
-      setMessage("");
-      setGoogleLoading(true);
+    const redirectUrl =
+      `${window.location.origin}/viyazham-publication/login`;
 
-      /*
-       * IMPORTANT:
-       *
-       * Your deployed GitHub Pages website uses:
-       *
-       * /viyazham-publication/
-       *
-       * Therefore Google should return to:
-       *
-       * /viyazham-publication/userdashboard
-       *
-       * Do NOT use:
-       * /UserDashboard
-       *
-       * because your React route is:
-       * /userdashboard
-       */
+    console.log("Google redirect URL:", redirectUrl);
 
-      const redirectUrl =
-        `${window.location.origin}/viyazham-publication/userdashboard`;
-
-      console.log(
-        "Google redirect URL:",
-        redirectUrl
-      );
-
-      const {
-        error: googleError,
-      } = await supabase.auth.signInWithOAuth({
+    const { error: googleError } =
+      await supabase.auth.signInWithOAuth({
         provider: "google",
-
         options: {
           redirectTo: redirectUrl,
         },
       });
 
-      if (googleError) {
-        throw googleError;
-      }
-
-    } catch (err) {
-      console.error(
-        "Google login error:",
-        err
-      );
-
-      setError(
-        err?.message ||
-          "Unable to continue with Google."
-      );
-
-      setGoogleLoading(false);
+    if (googleError) {
+      throw googleError;
     }
-  };
+  } catch (err) {
+    console.error("Google login error:", err);
+    setError(err?.message || "Unable to continue with Google.");
+    setGoogleLoading(false);
+  }
+};
+  
+       
+      
 
   // ======================================================
   // FORGOT PASSWORD
