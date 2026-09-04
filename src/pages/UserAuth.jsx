@@ -19,26 +19,11 @@ import {
 
 import { supabase } from "../services/supabaseClient";
 
-// ======================================================
-// ADMIN EMAIL
-// ======================================================
-
 const ADMIN_EMAIL = "vizhadmin@gmail.com";
-
-// ======================================================
-// USER DASHBOARD ROUTE
-// IMPORTANT: Keep this lowercase.
-// Filename can still be UserDashboard.jsx
-// ======================================================
-
 const USER_DASHBOARD = "/userdashboard";
 
 function UserAuth() {
   const navigate = useNavigate();
-  
-  // ======================================================
-  // STATES
-  // ======================================================
 
   const [isSignup, setIsSignup] = useState(false);
 
@@ -48,8 +33,7 @@ function UserAuth() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -57,6 +41,42 @@ function UserAuth() {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  // ======================================================
+  // GET CURRENT USER AND NAVIGATE
+  // ======================================================
+
+  const navigateAfterLogin = async (session) => {
+    if (!session?.user) {
+      setError("Login successful, but no user session was found.");
+      return;
+    }
+
+    const loggedInEmail = session.user.email?.trim().toLowerCase();
+
+    if (!loggedInEmail) {
+      setError("Login successful, but user email could not be found.");
+      return;
+    }
+
+    console.log("Authenticated email:", loggedInEmail);
+
+    if (loggedInEmail === ADMIN_EMAIL.toLowerCase()) {
+      console.log("Admin detected → /admin");
+
+      navigate("/admin", {
+        replace: true,
+      });
+
+      return;
+    }
+
+    console.log("Normal user → /userdashboard");
+
+    navigate(USER_DASHBOARD, {
+      replace: true,
+    });
+  };
 
   // ======================================================
   // EMAIL LOGIN / SIGNUP
@@ -92,9 +112,7 @@ function UserAuth() {
         }
 
         if (password.length < 6) {
-          setError(
-            "Password must contain at least 6 characters."
-          );
+          setError("Password must contain at least 6 characters.");
           return;
         }
 
@@ -120,24 +138,19 @@ function UserAuth() {
           throw signupError;
         }
 
-        // If Supabase immediately created a session,
-        // go directly to the user dashboard.
+        // If Supabase creates a session immediately,
+        // navigate directly to the correct dashboard.
         if (data?.session) {
-          navigate(USER_DASHBOARD, {
-            replace: true,
-          });
-
+          await navigateAfterLogin(data.session);
           return;
         }
 
-        // If email confirmation is enabled,
-        // ask the user to verify/login.
+        // Email confirmation is enabled.
         setMessage(
           "Account created successfully. Please check your email and login to continue."
         );
 
         setIsSignup(false);
-
         setPassword("");
         setConfirmPassword("");
 
@@ -160,73 +173,30 @@ function UserAuth() {
         throw loginError;
       }
 
-      // ==================================================
-      // GET USER EMAIL
-      // ==================================================
-
-      const loggedInEmail =
-        data?.session?.user?.email
-          ?.trim()
-          .toLowerCase();
-
-      if (!loggedInEmail) {
-        setError(
-          "Login successful, but user email could not be found."
-        );
-
-        return;
-      }
-
-      console.log(
-        "Logged in email:",
-        loggedInEmail
-      );
+      console.log("Email login successful.");
 
       // ==================================================
-      // ADMIN
-      // ONLY vizhadmin@gmail.com
+      // IMPORTANT:
+      // Confirm the session from Supabase before navigating.
       // ==================================================
 
-      if (
-        loggedInEmail ===
-        ADMIN_EMAIL.toLowerCase()
-      ) {
-        console.log(
-          "Admin detected → /admin"
-        );
+      const {
+        data: {
+          session: currentSession,
+        },
+      } = await supabase.auth.getSession();
 
-        navigate("/admin", {
-          replace: true,
-        });
+      const session = currentSession || data?.session;
 
-        return;
-      }
-
-      // ==================================================
-      // NORMAL USER
-      // ==================================================
-
-      console.log(
-        "Normal user detected → /userdashboard"
-      );
-
-      navigate(USER_DASHBOARD, {
-        replace: true,
-      });
-
-      return;
+      await navigateAfterLogin(session);
 
     } catch (err) {
-      console.error(
-        "Authentication error:",
-        err
-      );
+      console.error("Authentication error:", err);
 
       setError(
         err?.message ||
           "Unable to login. Please check your email and password."
       );
-
     } finally {
       setLoading(false);
     }
@@ -235,37 +205,47 @@ function UserAuth() {
   // ======================================================
   // GOOGLE LOGIN
   // ======================================================
-const handleGoogleLogin = async () => {
-  try {
-    setError("");
-    setMessage("");
-    setGoogleLoading(true);
 
-    const redirectUrl =
-      `${window.location.origin}/viyazham-publication/login`;
+  const handleGoogleLogin = async () => {
+    try {
+      setError("");
+      setMessage("");
+      setGoogleLoading(true);
 
-    console.log("Google redirect URL:", redirectUrl);
+      const redirectUrl =
+        `${window.location.origin}/viyazham-publication/auth/callback`;
 
-    const { error: googleError } =
-      await supabase.auth.signInWithOAuth({
+      console.log("Google redirect URL:", redirectUrl);
+
+      const {
+        data,
+        error: googleError,
+      } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectUrl,
         },
       });
 
-    if (googleError) {
-      throw googleError;
+      console.log("Google OAuth response:", data);
+
+      if (googleError) {
+        throw googleError;
+      }
+
+      // Google will redirect the browser to Google.
+      // AuthCallback.jsx handles the final navigation.
+    } catch (err) {
+      console.error("Google login error:", err);
+
+      setError(
+        err?.message ||
+          "Unable to continue with Google."
+      );
+
+      setGoogleLoading(false);
     }
-  } catch (err) {
-    console.error("Google login error:", err);
-    setError(err?.message || "Unable to continue with Google.");
-    setGoogleLoading(false);
-  }
-};
-  
-       
-      
+  };
 
   // ======================================================
   // FORGOT PASSWORD
@@ -279,7 +259,6 @@ const handleGoogleLogin = async () => {
       setError(
         "Please enter your email address first."
       );
-
       return;
     }
 
@@ -305,7 +284,6 @@ const handleGoogleLogin = async () => {
       setMessage(
         "Password reset link has been sent to your email."
       );
-
     } catch (err) {
       console.error(
         "Forgot password error:",
@@ -316,7 +294,6 @@ const handleGoogleLogin = async () => {
         err?.message ||
           "Unable to send password reset email."
       );
-
     } finally {
       setForgotLoading(false);
     }

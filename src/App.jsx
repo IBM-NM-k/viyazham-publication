@@ -18,7 +18,7 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 
 import Admin from "./pages/Admin.jsx";
 import AddBook from "./pages/AddBook.jsx";
-
+import AuthCallback from "./pages/AuthCallback.jsx";
 function App() {
   return (
     <Routes>
@@ -77,7 +77,10 @@ function App() {
         element={<UserAuth />}
       />
 
-
+<Route
+  path="/auth/callback"
+  element={<AuthCallback />}
+/> 
       {/* RESET PASSWORD */}
 
       <Route

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,9 +11,11 @@ import {
   Eye,
 } from "lucide-react";
 
-// IMPORTANT:
-// Change this path only if your booksService.js is located somewhere else.
+// Books service
 import { getAllBooks } from "../services/booksService";
+
+// Supabase
+import { supabase } from "../services/supabaseClient";
 
 const BOOKS_KEY = "viyazham_uploaded_books";
 
@@ -65,23 +66,104 @@ function UserDashboard() {
   ];
 
   // =====================================================
-  // LOGIN GUARD
+  // SUPABASE LOGIN CHECK
   // =====================================================
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem("userLoggedIn");
-    const storedUser = localStorage.getItem("currentUser");
+    let mounted = true;
 
-    if (loggedIn !== "true" || !storedUser) {
-      navigate("/login");
-      return;
-    }
+    const checkUser = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
 
-    try {
-      setCurrentUser(JSON.parse(storedUser));
-    } catch {
-      navigate("/login");
-    }
+        if (error) {
+          console.error("Session error:", error);
+
+          if (mounted) {
+            setCurrentUser(null);
+            navigate("/login", { replace: true });
+          }
+
+          return;
+        }
+
+        if (!mounted) return;
+
+        // No Supabase session
+        if (!session?.user) {
+          console.log("No Supabase session. Redirecting to login.");
+
+          setCurrentUser(null);
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        // Supabase user
+        const user = session.user;
+
+        console.log("Dashboard Supabase user:", user);
+
+        setCurrentUser({
+          id: user.id,
+          email: user.email || "",
+          name:
+            user.user_metadata?.name ||
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "User",
+        });
+      } catch (error) {
+        console.error("Dashboard authentication error:", error);
+
+        if (mounted) {
+          setCurrentUser(null);
+          navigate("/login", { replace: true });
+        }
+      }
+    };
+
+    checkUser();
+
+    // Listen for login/logout changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!mounted) return;
+
+        console.log(
+          "Dashboard auth event:",
+          _event,
+          session
+        );
+
+        if (!session?.user) {
+          setCurrentUser(null);
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        const user = session.user;
+
+        setCurrentUser({
+          id: user.id,
+          email: user.email || "",
+          name:
+            user.user_metadata?.name ||
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "User",
+        });
+      }
+    );
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   // =====================================================
@@ -150,11 +232,25 @@ function UserDashboard() {
   // LOGOUT
   // =====================================================
 
-  const handleLogout = () => {
-    localStorage.removeItem("userLoggedIn");
-    localStorage.removeItem("currentUser");
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
 
-    navigate("/");
+      if (error) {
+        console.error("Logout error:", error);
+      }
+
+      // Remove old localStorage values too
+      // in case they still exist from the old login system.
+      localStorage.removeItem("userLoggedIn");
+      localStorage.removeItem("currentUser");
+
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Logout failed:", error);
+
+      navigate("/", { replace: true });
+    }
   };
 
   // =====================================================
@@ -245,7 +341,23 @@ Thank you.`;
   // =====================================================
 
   if (!currentUser) {
-    return null;
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f7f3ed",
+          color: "#7B1E3C",
+          fontFamily:
+            'Georgia, "Times New Roman", serif',
+          fontSize: "18px",
+        }}
+      >
+        Checking your login...
+      </div>
+    );
   }
 
   return (
@@ -346,7 +458,6 @@ Thank you.`;
 
         </div>
 
-
         {/* =================================================
             FEATURED BOOK
         ================================================= */}
@@ -427,7 +538,6 @@ Thank you.`;
 
             </div>
 
-
             {/* =================================================
                 FEATURED DETAILS
             ================================================= */}
@@ -458,7 +568,6 @@ Thank you.`;
                 NEWLY PUBLISHED
               </div>
 
-
               <h2
                 style={{
                   margin: "0 0 8px",
@@ -471,7 +580,6 @@ Thank you.`;
                 {featuredBook.title}
               </h2>
 
-
               <p
                 style={{
                   margin: "0 0 14px",
@@ -483,7 +591,6 @@ Thank you.`;
               >
                 By {getAuthorName(featuredBook)}
               </p>
-
 
               {featuredBook.category && (
 
@@ -504,7 +611,6 @@ Thank you.`;
                 </div>
 
               )}
-
 
               {featuredBook.description && (
 
@@ -527,7 +633,6 @@ Thank you.`;
 
               )}
 
-
               {/* PRICE */}
 
               <div
@@ -539,7 +644,6 @@ Thank you.`;
               >
                 {getPrice(featuredBook)}
               </div>
-
 
               {/* ACTIONS */}
 
@@ -572,7 +676,6 @@ Thank you.`;
                   <ShoppingBag size={17} />
                   Buy Now
                 </button>
-
 
                 <button
                   onClick={() =>
@@ -607,7 +710,6 @@ Thank you.`;
           </section>
 
         )}
-
 
         {/* =================================================
             RECENTLY ADDED BOOKS
@@ -667,7 +769,6 @@ Thank you.`;
 
             </div>
 
-
             <button
               onClick={() => navigate("/books")}
               style={{
@@ -687,7 +788,6 @@ Thank you.`;
             </button>
 
           </div>
-
 
           {/* =================================================
               NO BOOKS
@@ -841,7 +941,6 @@ Thank you.`;
 
                     </div>
 
-
                     {/* =================================================
                         BOOK DETAILS
                     ================================================= */}
@@ -873,7 +972,6 @@ Thank you.`;
                           "Uncategorized"}
                       </div>
 
-
                       {/* TITLE */}
 
                       <h3
@@ -894,7 +992,6 @@ Thank you.`;
                         {book.title}
                       </h3>
 
-
                       {/* AUTHOR */}
 
                       <p
@@ -907,7 +1004,6 @@ Thank you.`;
                       >
                         By {getAuthorName(book)}
                       </p>
-
 
                       {/* DESCRIPTION */}
 
@@ -932,7 +1028,6 @@ Thank you.`;
                         </p>
 
                       )}
-
 
                       {/* PRICE + BUY */}
 
@@ -959,7 +1054,6 @@ Thank you.`;
                         >
                           {getPrice(book)}
                         </strong>
-
 
                         <button
                           onClick={() =>
@@ -1007,7 +1101,6 @@ Thank you.`;
 
         </section>
 
-
         {/* =================================================
             BROWSE ALL BOOKS
         ================================================= */}
@@ -1048,7 +1141,6 @@ Thank you.`;
         )}
 
       </div>
-
 
       {/* =================================================
           WHATSAPP SELECTION MODAL
@@ -1109,15 +1201,13 @@ Thank you.`;
                 background: "#f3f1ed",
                 cursor: "pointer",
                 display: "flex",
-                alignItems:
-                  "center",
+                alignItems: "center",
                 justifyContent:
                   "center",
               }}
             >
               <X size={18} />
             </button>
-
 
             {/* WHATSAPP ICON */}
 
@@ -1139,7 +1229,6 @@ Thank you.`;
               />
             </div>
 
-
             <h2
               style={{
                 margin: 0,
@@ -1151,7 +1240,6 @@ Thank you.`;
               Choose WhatsApp
             </h2>
 
-
             <p
               style={{
                 margin:
@@ -1162,7 +1250,6 @@ Thank you.`;
             >
               Contact us to purchase:
             </p>
-
 
             {/* SELECTED BOOK */}
 
@@ -1229,7 +1316,6 @@ Thank you.`;
 
               </div>
 
-
               <div
                 style={{
                   minWidth: 0,
@@ -1275,7 +1361,6 @@ Thank you.`;
               </div>
 
             </div>
-
 
             {/* WHATSAPP NUMBERS */}
 
@@ -1360,7 +1445,6 @@ Thank you.`;
                       />
                     </div>
 
-
                     <div
                       style={{
                         flex: 1,
@@ -1396,7 +1480,6 @@ Thank you.`;
 
                     </div>
 
-
                     <ArrowRight
                       size={18}
                       color="#777"
@@ -1408,7 +1491,6 @@ Thank you.`;
               )}
 
             </div>
-
 
             {/* CANCEL */}
 

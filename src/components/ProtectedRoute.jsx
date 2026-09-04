@@ -11,29 +11,40 @@ function ProtectedRoute({ children }) {
   useEffect(() => {
     let mounted = true;
 
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (mounted) {
-        setSession(session);
-        setLoading(false);
-      }
-    };
-
-    checkSession();
-
+    // Listen for authentication changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
-        if (mounted) {
-          setSession(newSession);
-          setLoading(false);
-        }
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (!mounted) return;
+
+      console.log("ProtectedRoute auth event:", event);
+      console.log("ProtectedRoute session:", newSession);
+
+      setSession(newSession);
+      setLoading(false);
+    });
+
+    // Check the current session
+    const loadSession = async () => {
+      const {
+        data: { session: currentSession },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (!mounted) return;
+
+      if (error) {
+        console.error("ProtectedRoute session error:", error);
+        setSession(null);
+      } else {
+        console.log("ProtectedRoute current session:", currentSession);
+        setSession(currentSession);
       }
-    );
+
+      setLoading(false);
+    };
+
+    loadSession();
 
     return () => {
       mounted = false;
@@ -41,6 +52,7 @@ function ProtectedRoute({ children }) {
     };
   }, []);
 
+  // While Supabase is checking the login
   if (loading) {
     return (
       <div
@@ -59,7 +71,8 @@ function ProtectedRoute({ children }) {
     );
   }
 
-  if (!session) {
+  // No authenticated user
+  if (!session?.user) {
     return (
       <Navigate
         to="/login"
@@ -71,6 +84,7 @@ function ProtectedRoute({ children }) {
     );
   }
 
+  // Authenticated user
   return children;
 }
 
