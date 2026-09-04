@@ -58,8 +58,7 @@ function AdminLogin() {
        * Replace this email with the actual admin email
        * that you create in Supabase Authentication.
        */
-      const ADMIN_EMAIL = "your-admin-email@gmail.com";
-
+      const ADMIN_EMAIL = "vizhadmin@gmail.com";
       if (data.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
         await supabase.auth.signOut();
 

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./UserAuth.css";
+
 import {
   UserRound,
   Lock,
@@ -14,10 +16,29 @@ import {
   Stars,
   Library,
 } from "lucide-react";
+
 import { supabase } from "../services/supabaseClient";
+
+// ======================================================
+// ADMIN EMAIL
+// ======================================================
+
+const ADMIN_EMAIL = "vizhadmin@gmail.com";
+
+// ======================================================
+// USER DASHBOARD ROUTE
+// IMPORTANT: Keep this lowercase.
+// Filename can still be UserDashboard.jsx
+// ======================================================
+
+const USER_DASHBOARD = "/userdashboard";
 
 function UserAuth() {
   const navigate = useNavigate();
+
+  // ======================================================
+  // STATES
+  // ======================================================
 
   const [isSignup, setIsSignup] = useState(false);
 
@@ -37,56 +58,9 @@ function UserAuth() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // =========================================================
-  // GOOGLE LOGIN
-  // =========================================================
-
-  const handleGoogleLogin = async () => {
-    try {
-      setError("");
-      setMessage("");
-      setGoogleLoading(true);
-
-      /*
-       * IMPORTANT:
-       * Your website is using /viyazham-publication/
-       * as the GitHub Pages base path.
-       */
-
-      const redirectUrl =
-        `${window.location.origin}/viyazham-publication/user-updates`;
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: redirectUrl,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      /*
-       * Supabase normally redirects the browser to Google here.
-       * Therefore we don't set googleLoading(false) on success.
-       */
-
-    } catch (err) {
-      console.error("Google login error:", err);
-
-      setError(
-        err?.message ||
-          "Unable to continue with Google. Please try again."
-      );
-
-      setGoogleLoading(false);
-    }
-  };
-
-  // =========================================================
+  // ======================================================
   // EMAIL LOGIN / SIGNUP
-  // =========================================================
+  // ======================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,13 +68,7 @@ function UserAuth() {
     setError("");
     setMessage("");
 
-    const cleanEmail = email.trim().toLowerCase();
-
-    // -----------------------------
-    // BASIC VALIDATION
-    // -----------------------------
-
-    if (!cleanEmail) {
+    if (!email.trim()) {
       setError("Please enter your email address.");
       return;
     }
@@ -110,91 +78,143 @@ function UserAuth() {
       return;
     }
 
-    if (isSignup) {
-      if (!name.trim()) {
-        setError("Please enter your name.");
-        return;
-      }
-
-      if (password.length < 6) {
-        setError(
-          "Password must contain at least 6 characters."
-        );
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        setError("Passwords do not match.");
-        return;
-      }
-    }
-
     try {
       setLoading(true);
 
-      // =====================================================
-      // SIGN UP
-      // =====================================================
+      // ==================================================
+      // SIGNUP
+      // ==================================================
 
       if (isSignup) {
-        const { data, error } =
-          await supabase.auth.signUp({
-            email: cleanEmail,
-            password,
-            options: {
-              data: {
-                name: name.trim(),
-              },
-              emailRedirectTo:
-                `${window.location.origin}/viyazham-publication/user-updates`,
+        if (!name.trim()) {
+          setError("Please enter your name.");
+          return;
+        }
+
+        if (password.length < 6) {
+          setError(
+            "Password must contain at least 6 characters."
+          );
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setError("Passwords do not match.");
+          return;
+        }
+
+        const {
+          data,
+          error: signupError,
+        } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            data: {
+              name: name.trim(),
             },
+          },
+        });
+
+        if (signupError) {
+          throw signupError;
+        }
+
+        // If Supabase immediately created a session,
+        // go directly to the user dashboard.
+        if (data?.session) {
+          navigate(USER_DASHBOARD, {
+            replace: true,
           });
 
-        if (error) {
-          throw error;
+          return;
         }
 
-        /*
-         * If email confirmation is enabled in Supabase,
-         * session will be null until the user confirms email.
-         */
+        // If email confirmation is enabled,
+        // ask the user to verify/login.
+        setMessage(
+          "Account created successfully. Please check your email and login to continue."
+        );
 
-        if (data?.user && !data?.session) {
-          setMessage(
-            "Your account has been created. Please check your email and confirm your account."
-          );
-        } else {
-          setMessage("Account created successfully!");
+        setIsSignup(false);
 
-          setTimeout(() => {
-            navigate("/user-updates");
-          }, 800);
-        }
+        setPassword("");
+        setConfirmPassword("");
 
         return;
       }
 
-      // =====================================================
-      // LOGIN
-      // =====================================================
+      // ==================================================
+      // EMAIL + PASSWORD LOGIN
+      // ==================================================
 
-      const { data, error } =
-        await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password,
+      const {
+        data,
+        error: loginError,
+      } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (loginError) {
+        throw loginError;
+      }
+
+      // ==================================================
+      // GET USER EMAIL
+      // ==================================================
+
+      const loggedInEmail =
+        data?.session?.user?.email
+          ?.trim()
+          .toLowerCase();
+
+      if (!loggedInEmail) {
+        setError(
+          "Login successful, but user email could not be found."
+        );
+
+        return;
+      }
+
+      console.log(
+        "Logged in email:",
+        loggedInEmail
+      );
+
+      // ==================================================
+      // ADMIN
+      // ONLY vizhadmin@gmail.com
+      // ==================================================
+
+      if (
+        loggedInEmail ===
+        ADMIN_EMAIL.toLowerCase()
+      ) {
+        console.log(
+          "Admin detected → /admin"
+        );
+
+        navigate("/admin", {
+          replace: true,
         });
 
-      if (error) {
-        throw error;
+        return;
       }
 
-      if (data?.session) {
-        navigate("/user-updates");
-      } else {
-        setError(
-          "Login was not completed. Please try again."
-        );
-      }
+      // ==================================================
+      // NORMAL USER
+      // ==================================================
+
+      console.log(
+        "Normal user detected → /userdashboard"
+      );
+
+      navigate(USER_DASHBOARD, {
+        replace: true,
+      });
+
+      return;
 
     } catch (err) {
       console.error(
@@ -202,94 +222,129 @@ function UserAuth() {
         err
       );
 
-      let friendlyMessage =
+      setError(
         err?.message ||
-        "Something went wrong. Please try again.";
-
-      const lowerMessage =
-        err?.message?.toLowerCase() || "";
-
-      if (
-        lowerMessage.includes("invalid login") ||
-        lowerMessage.includes("invalid credentials")
-      ) {
-        friendlyMessage =
-          "Invalid email or password. Please check your details.";
-      }
-
-      if (
-        lowerMessage.includes("email not confirmed")
-      ) {
-        friendlyMessage =
-          "Please confirm your email before logging in.";
-      }
-
-      if (
-        lowerMessage.includes("already registered")
-      ) {
-        friendlyMessage =
-          "This email is already registered. Please sign in instead.";
-      }
-
-      setError(friendlyMessage);
+          "Unable to login. Please check your email and password."
+      );
 
     } finally {
-      /*
-       * THIS IS IMPORTANT.
-       * It prevents the Sign In button from being
-       * permanently stuck on "Signing in..."
-       */
-
       setLoading(false);
     }
   };
 
-  // =========================================================
+  // ======================================================
+  // GOOGLE LOGIN
+  // ======================================================
+
+  const handleGoogleLogin = async () => {
+    try {
+      setError("");
+      setMessage("");
+      setGoogleLoading(true);
+
+      /*
+       * IMPORTANT:
+       *
+       * Your deployed GitHub Pages website uses:
+       *
+       * /viyazham-publication/
+       *
+       * Therefore Google should return to:
+       *
+       * /viyazham-publication/userdashboard
+       *
+       * Do NOT use:
+       * /UserDashboard
+       *
+       * because your React route is:
+       * /userdashboard
+       */
+
+      const redirectUrl =
+        `${window.location.origin}/viyazham-publication/userdashboard`;
+
+      console.log(
+        "Google redirect URL:",
+        redirectUrl
+      );
+
+      const {
+        error: googleError,
+      } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+
+      if (googleError) {
+        throw googleError;
+      }
+
+    } catch (err) {
+      console.error(
+        "Google login error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Unable to continue with Google."
+      );
+
+      setGoogleLoading(false);
+    }
+  };
+
+  // ======================================================
   // FORGOT PASSWORD
-  // =========================================================
+  // ======================================================
 
   const handleForgotPassword = async () => {
     setError("");
     setMessage("");
 
-    const cleanEmail = email.trim().toLowerCase();
-
-    if (!cleanEmail) {
+    if (!email.trim()) {
       setError(
         "Please enter your email address first."
       );
+
       return;
     }
 
     try {
       setForgotLoading(true);
 
-      const { error } =
-        await supabase.auth.resetPasswordForEmail(
-          cleanEmail,
-          {
-            redirectTo:
-              `${window.location.origin}/viyazham-publication/reset-password`,
-          }
-        );
+      const redirectUrl =
+        `${window.location.origin}/viyazham-publication/reset-password`;
 
-      if (error) {
-        throw error;
+      const {
+        error: resetError,
+      } = await supabase.auth.resetPasswordForEmail(
+        email.trim(),
+        {
+          redirectTo: redirectUrl,
+        }
+      );
+
+      if (resetError) {
+        throw resetError;
       }
 
       setMessage(
-        "Password reset instructions have been sent to your email."
+        "Password reset link has been sent to your email."
       );
 
     } catch (err) {
       console.error(
-        "Password reset error:",
+        "Forgot password error:",
         err
       );
 
       setError(
         err?.message ||
-          "Unable to send password reset instructions."
+          "Unable to send password reset email."
       );
 
     } finally {
@@ -297,1019 +352,434 @@ function UserAuth() {
     }
   };
 
-  // =========================================================
+  // ======================================================
   // SWITCH LOGIN / SIGNUP
-  // =========================================================
+  // ======================================================
 
-  const switchMode = () => {
-    setIsSignup((previous) => !previous);
+  const handleSwitchMode = () => {
+    setIsSignup(!isSignup);
 
     setError("");
     setMessage("");
 
+    setName("");
+    setEmail("");
     setPassword("");
     setConfirmPassword("");
   };
 
-  // =========================================================
-  // STYLES
-  // =========================================================
-
-  const pageStyle = {
-    minHeight: "calc(100vh - 90px)",
-    position: "relative",
-    overflow: "hidden",
-
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-
-    padding: "55px 20px",
-
-    background:
-      "radial-gradient(circle at 15% 20%, rgba(188,145,75,0.14), transparent 28%), radial-gradient(circle at 85% 80%, rgba(115,82,45,0.12), transparent 30%), #f8f4ed",
-  };
-
-  const cardStyle = {
-    position: "relative",
-    zIndex: 5,
-
-    width: "100%",
-    maxWidth: "500px",
-
-    background:
-      "linear-gradient(145deg, rgba(255,255,255,0.99), rgba(252,248,241,0.98))",
-
-    border:
-      "1px solid rgba(116,87,48,0.17)",
-
-    borderRadius: "28px",
-
-    padding: "46px",
-
-    boxShadow:
-      "0 30px 80px rgba(61,43,23,0.16), 0 8px 25px rgba(61,43,23,0.08)",
-
-    backdropFilter: "blur(10px)",
-  };
-
-  const inputWrapperStyle = {
-    display: "flex",
-    alignItems: "center",
-
-    width: "100%",
-    minHeight: "56px",
-
-    border:
-      "1px solid #ddd5ca",
-
-    borderRadius: "14px",
-
-    background: "#fffdf9",
-
-    overflow: "hidden",
-
-    transition: "all 0.2s ease",
-  };
-
-  const inputStyle = {
-    width: "100%",
-
-    border: "none",
-    outline: "none",
-
-    background: "transparent",
-
-    padding: "15px 10px",
-
-    fontSize: "15px",
-
-    color: "#30291f",
-  };
-
-  const iconStyle = {
-    marginLeft: "15px",
-    color: "#8b765b",
-    flexShrink: 0,
-  };
-
-  const labelStyle = {
-    display: "block",
-
-    marginBottom: "8px",
-
-    fontSize: "14px",
-
-    fontWeight: "600",
-
-    color: "#493b2b",
-  };
-
-  const primaryButtonStyle = {
-    width: "100%",
-    minHeight: "56px",
-
-    border: "none",
-
-    borderRadius: "14px",
-
-    background:
-      "linear-gradient(135deg, #2d241b 0%, #51402e 100%)",
-
-    color: "white",
-
-    fontSize: "16px",
-
-    fontWeight: "700",
-
-    cursor: loading
-      ? "not-allowed"
-      : "pointer",
-
-    boxShadow:
-      "0 12px 28px rgba(45,36,27,0.22)",
-
-    display: "flex",
-
-    alignItems: "center",
-
-    justifyContent: "center",
-
-    gap: "10px",
-
-    transition: "all 0.2s ease",
-
-    opacity: loading ? 0.75 : 1,
-  };
+  // ======================================================
+  // UI
+  // ======================================================
 
   return (
-    <div style={pageStyle}>
+    <div className="auth-page">
 
-      {/* =====================================================
-          BACKGROUND BOOK DECORATION
-      ===================================================== */}
-
-      <div
-        style={{
-          position: "absolute",
-          top: "40px",
-          left: "7%",
-
-          opacity: 0.12,
-
-          transform: "rotate(-15deg)",
-        }}
-      >
-        <BookOpen
-          size={160}
-          strokeWidth={1}
-        />
+      <div className="auth-decoration auth-decoration-one">
+        <Feather size={28} />
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          bottom: "15px",
-          right: "7%",
-
-          opacity: 0.10,
-
-          transform: "rotate(12deg)",
-        }}
-      >
-        <Library
-          size={175}
-          strokeWidth={1}
-        />
+      <div className="auth-decoration auth-decoration-two">
+        <Stars size={32} />
       </div>
 
-      {/* Sparkles */}
-
-      <div
-        style={{
-          position: "absolute",
-          top: "16%",
-          right: "16%",
-
-          color: "#a17c4b",
-          opacity: 0.45,
-        }}
-      >
-        <Sparkles size={28} />
+      <div className="auth-decoration auth-decoration-three">
+        <Sparkles size={26} />
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          top: "34%",
-          left: "15%",
+      <div className="auth-container">
 
-          color: "#a17c4b",
-          opacity: 0.35,
-        }}
-      >
-        <Stars size={22} />
-      </div>
+        {/* ================= LEFT ================= */}
 
-      <div
-        style={{
-          position: "absolute",
-          bottom: "18%",
-          left: "18%",
+        <div className="auth-left">
 
-          color: "#a17c4b",
-          opacity: 0.35,
-        }}
-      >
-        <Sparkles size={20} />
-      </div>
+          <div className="auth-brand">
 
-      {/* =====================================================
-          LOGIN CARD
-      ===================================================== */}
-
-      <div style={cardStyle}>
-
-        {/* TOP BOOK ICON */}
-
-        <div
-          style={{
-            position: "absolute",
-
-            top: "-32px",
-
-            left: "50%",
-
-            transform:
-              "translateX(-50%)",
-
-            width: "66px",
-            height: "66px",
-
-            borderRadius: "21px",
-
-            background:
-              "linear-gradient(135deg, #321f13, #735536)",
-
-            display: "flex",
-
-            alignItems: "center",
-            justifyContent: "center",
-
-            boxShadow:
-              "0 12px 30px rgba(45,36,27,0.25)",
-
-            border:
-              "4px solid #f8f4ed",
-          }}
-        >
-          <BookOpen
-            size={30}
-            color="white"
-            strokeWidth={1.8}
-          />
-        </div>
-
-        {/* =================================================
-            HEADER
-        ================================================= */}
-
-        <div
-          style={{
-            textAlign: "center",
-
-            marginTop: "6px",
-
-            marginBottom: "30px",
-          }}
-        >
-
-          {/* Publication label */}
-
-          <div
-            style={{
-              display: "inline-flex",
-
-              alignItems: "center",
-
-              justifyContent: "center",
-
-              gap: "7px",
-
-              marginBottom: "10px",
-
-              color: "#9b7948",
-
-              fontFamily:
-                "Georgia, 'Times New Roman', serif",
-
-              fontSize: "12px",
-
-              fontWeight: "700",
-
-              letterSpacing: "2px",
-
-              textTransform: "uppercase",
-            }}
-          >
-            <Feather size={15} />
-
-            VIYAZHAM PUBLICATION
-
-            <Feather size={15} />
-          </div>
-
-          <h1
-            style={{
-              margin: 0,
-
-              fontFamily:
-                "Georgia, 'Times New Roman', serif",
-
-              fontSize: "34px",
-
-              color: "#2d241b",
-
-              lineHeight: "1.2",
-
-              fontWeight: "700",
-            }}
-          >
-            {isSignup
-              ? "Begin Your Story"
-              : "Welcome Back"}
-          </h1>
-
-          <p
-            style={{
-              margin:
-                "10px 0 0",
-
-              color: "#806f5b",
-
-              fontFamily:
-                "Georgia, 'Times New Roman', serif",
-
-              fontSize: "15px",
-            }}
-          >
-            {isSignup
-              ? "Create your literary journey with us"
-              : "Continue your literary journey"}
-          </p>
-        </div>
-
-        {/* =================================================
-            GOOGLE BUTTON
-        ================================================= */}
-
-        <button
-          type="button"
-          onClick={handleGoogleLogin}
-
-          disabled={googleLoading}
-
-          style={{
-            width: "100%",
-
-            minHeight: "55px",
-
-            border:
-              "1px solid #ddd5ca",
-
-            borderRadius: "14px",
-
-            background: "#fffefa",
-
-            color: "#40372d",
-
-            fontSize: "15px",
-
-            fontWeight: "650",
-
-            cursor: googleLoading
-              ? "not-allowed"
-              : "pointer",
-
-            display: "flex",
-
-            alignItems: "center",
-
-            justifyContent: "center",
-
-            gap: "11px",
-
-            opacity:
-              googleLoading ? 0.7 : 1,
-
-            transition: "all 0.2s ease",
-          }}
-        >
-          <Globe2
-            size={20}
-            color="#80613b"
-          />
-
-          {googleLoading
-            ? "Connecting..."
-            : "Continue with Google"}
-        </button>
-
-        {/* =================================================
-            DIVIDER
-        ================================================= */}
-
-        <div
-          style={{
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: "14px",
-
-            margin:
-              "25px 0",
-
-            color: "#a08d76",
-
-            fontSize: "13px",
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-
-              height: "1px",
-
-              background: "#ded5c9",
-            }}
-          />
-
-          <span
-            style={{
-              fontFamily:
-                "Georgia, 'Times New Roman', serif",
-            }}
-          >
-            OR
-          </span>
-
-          <div
-            style={{
-              flex: 1,
-
-              height: "1px",
-
-              background: "#ded5c9",
-            }}
-          />
-        </div>
-
-        {/* =================================================
-            NAME - SIGNUP ONLY
-        ================================================= */}
-
-        {isSignup && (
-          <div
-            style={{
-              marginBottom: "18px",
-            }}
-          >
-            <label style={labelStyle}>
-              Your Name
-            </label>
-
-            <div style={inputWrapperStyle}>
-              <UserRound
-                size={19}
-                style={iconStyle}
-              />
-
-              <input
-                type="text"
-
-                value={name}
-
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
-
-                placeholder="Enter your name"
-
-                style={inputStyle}
-
-                autoComplete="name"
-              />
+            <div className="auth-logo">
+              <BookOpen size={30} />
             </div>
-          </div>
-        )}
 
-        {/* =================================================
-            EMAIL
-        ================================================= */}
-
-        <div
-          style={{
-            marginBottom: "18px",
-          }}
-        >
-          <label style={labelStyle}>
-            Email Address
-          </label>
-
-          <div style={inputWrapperStyle}>
-
-            <Mail
-              size={19}
-              style={iconStyle}
-            />
-
-            <input
-              type="email"
-
-              value={email}
-
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
-
-              placeholder="Enter your email"
-
-              style={inputStyle}
-
-              autoComplete="email"
-            />
-          </div>
-        </div>
-
-        {/* =================================================
-            PASSWORD
-        ================================================= */}
-
-        <div
-          style={{
-            marginBottom: "10px",
-          }}
-        >
-          <label style={labelStyle}>
-            Password
-          </label>
-
-          <div style={inputWrapperStyle}>
-
-            <Lock
-              size={19}
-              style={iconStyle}
-            />
-
-            <input
-              type={
-                showPassword
-                  ? "text"
-                  : "password"
-              }
-
-              value={password}
-
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
-
-              placeholder="Enter your password"
-
-              style={inputStyle}
-
-              autoComplete={
-                isSignup
-                  ? "new-password"
-                  : "current-password"
-              }
-            />
-
-            <button
-              type="button"
-
-              onClick={() =>
-                setShowPassword(
-                  !showPassword
-                )
-              }
-
-              style={{
-                border: "none",
-
-                background:
-                  "transparent",
-
-                cursor: "pointer",
-
-                padding: "14px",
-
-                color: "#8b7b68",
-
-                display: "flex",
-              }}
-            >
-              {showPassword ? (
-                <EyeOff size={20} />
-              ) : (
-                <Eye size={20} />
-              )}
-            </button>
+            <div>
+              <h2>Viyazham Publication</h2>
+              <p>Tamil Books • Tamil Authors</p>
+            </div>
 
           </div>
-        </div>
 
-        {/* =================================================
-            CONFIRM PASSWORD
-        ================================================= */}
+          <div className="auth-left-content">
 
-        {isSignup && (
-          <div
-            style={{
-              marginTop: "18px",
+            <div className="auth-icon-circle">
+              <Library size={34} />
+            </div>
 
-              marginBottom: "10px",
-            }}
-          >
-            <label style={labelStyle}>
-              Confirm Password
-            </label>
+            <h1>
+              Discover the world of
+              <span> Tamil Literature</span>
+            </h1>
 
-            <div style={inputWrapperStyle}>
+            <p>
+              Read, explore and support wonderful
+              Tamil books and talented authors.
+            </p>
 
-              <Lock
-                size={19}
-                style={iconStyle}
-              />
+            <div className="auth-features">
 
-              <input
-                type={
-                  showConfirmPassword
-                    ? "text"
-                    : "password"
-                }
+              <div className="auth-feature">
 
-                value={confirmPassword}
+                <div className="auth-feature-icon">
+                  <BookOpen size={20} />
+                </div>
 
-                onChange={(e) =>
-                  setConfirmPassword(
-                    e.target.value
-                  )
-                }
+                <div>
+                  <strong>Explore Books</strong>
+                  <span>
+                    Discover published Tamil books
+                  </span>
+                </div>
 
-                placeholder="Confirm your password"
+              </div>
 
-                style={inputStyle}
+              <div className="auth-feature">
 
-                autoComplete="new-password"
-              />
+                <div className="auth-feature-icon">
+                  <Feather size={20} />
+                </div>
 
-              <button
-                type="button"
+                <div>
+                  <strong>Support Authors</strong>
+                  <span>
+                    Discover talented Tamil writers
+                  </span>
+                </div>
 
-                onClick={() =>
-                  setShowConfirmPassword(
-                    !showConfirmPassword
-                  )
-                }
+              </div>
 
-                style={{
-                  border: "none",
+              <div className="auth-feature">
 
-                  background:
-                    "transparent",
+                <div className="auth-feature-icon">
+                  <Globe2 size={20} />
+                </div>
 
-                  cursor: "pointer",
+                <div>
+                  <strong>One Tamil Community</strong>
+                  <span>
+                    Bringing readers and authors together
+                  </span>
+                </div>
 
-                  padding: "14px",
-
-                  color: "#8b7b68",
-
-                  display: "flex",
-                }}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
+              </div>
 
             </div>
+
           </div>
-        )}
 
-        {/* =================================================
-            FORGOT PASSWORD
-        ================================================= */}
+        </div>
 
-        {!isSignup && (
-          <div
-            style={{
-              display: "flex",
+        {/* ================= RIGHT ================= */}
 
-              justifyContent:
-                "flex-end",
+        <div className="auth-right">
 
-              marginBottom: "22px",
-            }}
-          >
-            <button
-              type="button"
+          <div className="auth-header">
 
-              onClick={
-                handleForgotPassword
-              }
-
-              disabled={forgotLoading}
-
-              style={{
-                border: "none",
-
-                background:
-                  "transparent",
-
-                color: "#73552f",
-
-                textDecoration:
-                  "underline",
-
-                cursor: forgotLoading
-                  ? "not-allowed"
-                  : "pointer",
-
-                fontSize: "14px",
-
-                padding: "3px",
-              }}
-            >
-              {forgotLoading
-                ? "Sending..."
-                : "Forgot password?"}
-            </button>
-          </div>
-        )}
-
-        {/* =================================================
-            ERROR
-        ================================================= */}
-
-        {error && (
-          <div
-            style={{
-              padding:
-                "13px 15px",
-
-              borderRadius: "12px",
-
-              marginBottom: "18px",
-
-              background:
-                "#fff2f0",
-
-              border:
-                "1px solid #f0c9c3",
-
-              color: "#a63d32",
-
-              fontSize: "13px",
-
-              lineHeight: "1.5",
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        {/* =================================================
-            SUCCESS
-        ================================================= */}
-
-        {message && (
-          <div
-            style={{
-              padding:
-                "13px 15px",
-
-              borderRadius: "12px",
-
-              marginBottom: "18px",
-
-              background:
-                "#f3f8f1",
-
-              border:
-                "1px solid #cbdcc4",
-
-              color: "#47633e",
-
-              fontSize: "13px",
-
-              lineHeight: "1.5",
-            }}
-          >
-            {message}
-          </div>
-        )}
-
-        {/* =================================================
-            SIGN IN / CREATE ACCOUNT
-        ================================================= */}
-
-        <button
-          type="submit"
-
-          onClick={handleSubmit}
-
-          disabled={loading}
-
-          style={primaryButtonStyle}
-        >
-          {loading ? (
-            <>
-              <span
-                style={{
-                  width: "18px",
-
-                  height: "18px",
-
-                  border:
-                    "2px solid rgba(255,255,255,0.35)",
-
-                  borderTopColor:
-                    "white",
-
-                  borderRadius: "50%",
-
-                  animation:
-                    "viyazhamSpin 0.8s linear infinite",
-                }}
-              />
-
+            <h1>
               {isSignup
-                ? "Creating account..."
-                : "Signing in..."}
-            </>
-          ) : (
-            <>
+                ? "Create your account"
+                : "Welcome back"}
+            </h1>
+
+            <p>
               {isSignup
-                ? "Create My Account"
-                : "Sign In"}
+                ? "Join Viyazham Publication and explore Tamil literature."
+                : "Login to continue your reading journey."}
+            </p>
 
-              <ArrowRight
-                size={18}
-              />
-            </>
-          )}
-        </button>
+          </div>
 
-        {/* =================================================
-            SWITCH LOGIN / SIGNUP
-        ================================================= */}
-
-        <div
-          style={{
-            textAlign: "center",
-
-            marginTop: "25px",
-
-            color: "#806f5b",
-
-            fontSize: "14px",
-          }}
-        >
-          {isSignup
-            ? "Already have an account?"
-            : "New to Viyazham?"}
+          {/* GOOGLE */}
 
           <button
             type="button"
-
-            onClick={switchMode}
-
-            style={{
-              border: "none",
-
-              background:
-                "transparent",
-
-              color: "#5e4225",
-
-              fontWeight: "700",
-
-              textDecoration:
-                "underline",
-
-              cursor: "pointer",
-
-              marginLeft: "6px",
-
-              fontSize: "14px",
-            }}
+            className="google-login-btn"
+            onClick={handleGoogleLogin}
+            disabled={
+              googleLoading || loading
+            }
           >
-            {isSignup
-              ? "Sign in"
-              : "Create an account"}
+
+            {googleLoading ? (
+              <span className="auth-spinner"></span>
+            ) : (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="#4285F4"
+                  d="M21.35 12.23c0-.79-.07-1.55-.2-2.27H12v4.3h5.23a4.47 4.47 0 0 1-1.94 2.93v2.44h3.14c1.84-1.69 2.92-4.18 2.92-7.4z"
+                />
+
+                <path
+                  fill="#34A853"
+                  d="M12 21.5c2.63 0 4.84-.87 6.45-2.36l-3.14-2.44c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.52A9.74 9.74 0 0 0 12 21.5z"
+                />
+
+                <path
+                  fill="#FBBC05"
+                  d="M6.54 13.59A5.85 5.85 0 0 1 6.23 12c0-.55.11-1.09.31-1.59V7.89H3.3A9.5 9.5 0 0 0 2.25 12c0 1.53.37 2.97 1.05 4.11l3.24-2.52z"
+                />
+
+                <path
+                  fill="#EA4335"
+                  d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.83 3.43 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.39l3.24 2.52C7.31 8.1 9.46 6.38 12 6.38z"
+                />
+              </svg>
+            )}
+
+            <span>
+              {googleLoading
+                ? "Connecting..."
+                : "Continue with Google"}
+            </span>
+
           </button>
-        </div>
 
-        {/* =================================================
-            BOTTOM DECORATION
-        ================================================= */}
+          <div className="auth-divider">
+            <span>or continue with email</span>
+          </div>
 
-        <div
-          style={{
-            display: "flex",
+          {error && (
+            <div className="auth-error">
+              {error}
+            </div>
+          )}
 
-            alignItems: "center",
+          {message && (
+            <div className="auth-message">
+              {message}
+            </div>
+          )}
 
-            justifyContent:
-              "center",
+          {/* EMAIL FORM */}
 
-            gap: "9px",
-
-            marginTop: "28px",
-
-            color: "#b39a79",
-          }}
-        >
-          <div
-            style={{
-              width: "35px",
-
-              height: "1px",
-
-              background:
-                "#d9cbbb",
-            }}
-          />
-
-          <Sparkles size={14} />
-
-          <span
-            style={{
-              fontFamily:
-                "Georgia, 'Times New Roman', serif",
-
-              fontSize: "10px",
-
-              letterSpacing:
-                "1.5px",
-
-              whiteSpace:
-                "nowrap",
-            }}
+          <form
+            className="auth-form"
+            onSubmit={handleSubmit}
           >
-            EVERY BOOK HAS A STORY
-          </span>
 
-          <Sparkles size={14} />
+            {isSignup && (
+              <div className="auth-field">
 
-          <div
-            style={{
-              width: "35px",
+                <label>Your Name</label>
 
-              height: "1px",
+                <div className="auth-input-wrapper">
 
-              background:
-                "#d9cbbb",
-            }}
-          />
+                  <UserRound size={19} />
+
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) =>
+                      setName(e.target.value)
+                    }
+                    disabled={loading}
+                  />
+
+                </div>
+
+              </div>
+            )}
+
+            <div className="auth-field">
+
+              <label>Email Address</label>
+
+              <div className="auth-input-wrapper">
+
+                <Mail size={19} />
+
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) =>
+                    setEmail(e.target.value)
+                  }
+                  disabled={loading}
+                />
+
+              </div>
+
+            </div>
+
+            <div className="auth-field">
+
+              <label>Password</label>
+
+              <div className="auth-input-wrapper">
+
+                <Lock size={19} />
+
+                <input
+                  type={
+                    showPassword
+                      ? "text"
+                      : "password"
+                  }
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
+                  disabled={loading}
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() =>
+                    setShowPassword(!showPassword)
+                  }
+                >
+                  {showPassword ? (
+                    <EyeOff size={19} />
+                  ) : (
+                    <Eye size={19} />
+                  )}
+                </button>
+
+              </div>
+
+            </div>
+
+            {isSignup && (
+              <div className="auth-field">
+
+                <label>Confirm Password</label>
+
+                <div className="auth-input-wrapper">
+
+                  <Lock size={19} />
+
+                  <input
+                    type={
+                      showConfirmPassword
+                        ? "text"
+                        : "password"
+                    }
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) =>
+                      setConfirmPassword(
+                        e.target.value
+                      )
+                    }
+                    disabled={loading}
+                  />
+
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() =>
+                      setShowConfirmPassword(
+                        !showConfirmPassword
+                      )
+                    }
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff size={19} />
+                    ) : (
+                      <Eye size={19} />
+                    )}
+                  </button>
+
+                </div>
+
+              </div>
+            )}
+
+            {!isSignup && (
+              <div className="forgot-password-row">
+
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={
+                    forgotLoading ||
+                    loading
+                  }
+                >
+                  {forgotLoading
+                    ? "Sending..."
+                    : "Forgot password?"}
+                </button>
+
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="auth-submit-btn"
+              disabled={
+                loading ||
+                googleLoading
+              }
+            >
+
+              {loading ? (
+                <span className="auth-spinner"></span>
+              ) : (
+                <>
+                  <span>
+                    {isSignup
+                      ? "Create Account"
+                      : "Login"}
+                  </span>
+
+                  <ArrowRight size={19} />
+                </>
+              )}
+
+            </button>
+
+          </form>
+
+          {/* SWITCH */}
+
+          <div className="auth-switch">
+
+            <span>
+              {isSignup
+                ? "Already have an account?"
+                : "Don't have an account?"}
+            </span>
+
+            <button
+              type="button"
+              onClick={handleSwitchMode}
+            >
+              {isSignup
+                ? "Login"
+                : "Create Account"}
+            </button>
+
+          </div>
+
+          <div className="auth-footer">
+
+            <BookOpen size={15} />
+
+            <span>
+              Viyazham Publication
+            </span>
+
+          </div>
+
         </div>
+
       </div>
 
-      {/* =====================================================
-          ANIMATION + RESPONSIVE CSS
-      ===================================================== */}
-
-      <style>
-        {`
-          @keyframes viyazhamSpin {
-            from {
-              transform: rotate(0deg);
-            }
-
-            to {
-              transform: rotate(360deg);
-            }
-          }
-
-          input::placeholder {
-            color: #a29586;
-          }
-
-          button:hover:not(:disabled) {
-            transform: translateY(-1px);
-          }
-
-          @media (max-width: 600px) {
-            .viyazham-login-card {
-              padding: 30px 22px;
-            }
-          }
-        `}
-      </style>
     </div>
   );
 }
