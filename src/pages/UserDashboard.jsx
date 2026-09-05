@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import {
   BookOpen,
   LogOut,
   Sparkles,
   ArrowRight,
-
   MessageCircle,
   X,
-  Eye,
   ChevronRight,
 } from "lucide-react";
 
@@ -99,9 +98,9 @@ function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedBook, setSelectedBook] = useState(null);
 
-  // ==============================
+  // ==========================================
   // AUTH
-  // ==============================
+  // ==========================================
 
   useEffect(() => {
     let mounted = true;
@@ -171,9 +170,9 @@ function UserDashboard() {
     };
   }, [navigate]);
 
-  // ==============================
+  // ==========================================
   // LOAD ALL BOOKS
-  // ==============================
+  // ==========================================
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -186,24 +185,12 @@ function UserDashboard() {
             !book.status
         );
 
-        /*
-          Keep ALL published books in state.
-
-          The newest uploaded book is at the end
-          of the stored array, so reverse the array.
-
-          This means:
-          newest → oldest
-        */
+        // Newest uploaded book first
         const latestBooks = [...publishedBooks].reverse();
 
         setBooks(latestBooks);
       } catch (error) {
-        console.error(
-          "Failed to load books:",
-          error
-        );
-
+        console.error("Failed to load books:", error);
         setBooks([]);
       }
     };
@@ -211,9 +198,9 @@ function UserDashboard() {
     loadBooks();
   }, []);
 
-  // ==============================
+  // ==========================================
   // LOGOUT
-  // ==============================
+  // ==========================================
 
   const handleLogout = async () => {
     try {
@@ -228,13 +215,17 @@ function UserDashboard() {
     }
   };
 
-  // ==============================
-  // BUY
-  // ==============================
+  // ==========================================
+  // BUY NOW
+  // ==========================================
 
   const handleBuyNow = (book) => {
     setSelectedBook(book);
   };
+
+  // ==========================================
+  // OPEN WHATSAPP
+  // ==========================================
 
   const openWhatsApp = (number) => {
     if (!selectedBook) return;
@@ -248,15 +239,16 @@ function UserDashboard() {
 I would like to buy this book.
 
 Book: ${title}
+
 Author: ${author}
+
 Price: ${price}
 
 Please provide the purchase details.`;
 
-    const whatsappUrl =
-      `https://wa.me/${number}?text=${encodeURIComponent(
-        message
-      )}`;
+    const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(
+      message
+    )}`;
 
     window.open(
       whatsappUrl,
@@ -267,9 +259,9 @@ Please provide the purchase details.`;
     setSelectedBook(null);
   };
 
-  // ==============================
+  // ==========================================
   // LOADING
-  // ==============================
+  // ==========================================
 
   if (loading || !currentUser) {
     return (
@@ -283,30 +275,26 @@ Please provide the purchase details.`;
     );
   }
 
-  /*
-    IMPORTANT:
+  // ==========================================
+  // BOOK DATA
+  // ==========================================
 
-    books = ALL published books
-    featuredBook = newest uploaded book
-    recentBooks = newest 8 books
-  */
+  // Newest uploaded book
+  const featuredBook =
+    books.length > 0 ? books[0] : null;
 
-  const featuredBook = books.length > 0
-    ? books[0]
-    : null;
-
+  // Newest 8 books
   const recentBooks = books.slice(0, 8);
 
   return (
     <main className="vd-page">
       <div className="vd-container">
 
-        {/* =================================================
+        {/* ==========================================
             TOP BAR
-        ================================================= */}
+        ========================================== */}
 
         <header className="vd-topbar">
-
           <div className="vd-brand">
             <div className="vd-brand-mark">
               <BookOpen size={20} />
@@ -326,54 +314,46 @@ Please provide the purchase details.`;
             <LogOut size={16} />
             <span>Logout</span>
           </button>
-
         </header>
 
-
-        {/* =================================================
+        {/* ==========================================
             WELCOME
-        ================================================= */}
+        ========================================== */}
 
         <section className="vd-welcome">
-
           <div className="vd-welcome-decoration">
             <Sparkles size={18} />
           </div>
 
           <div>
-
             <span className="vd-small-label">
               YOUR PERSONAL LIBRARY
             </span>
 
             <h1>
-              Welcome back,
+              Welcome back,{" "}
               <span>{currentUser.name}</span>
             </h1>
 
             <p>
-              Discover meaningful books, explore new stories,
-              and find something worth reading today.
+              Discover meaningful books, explore new
+              stories, and find something worth reading
+              today.
             </p>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
+        {/* ==========================================
             FEATURED BOOK
-            ALWAYS THE LATEST UPLOADED BOOK
-        ================================================= */}
+        ========================================== */}
 
         {featuredBook && (
-
           <section className="vd-featured">
-
             <div className="vd-featured-glow"></div>
 
-            <div className="vd-featured-cover-area">
+            {/* COVER */}
 
+            <div className="vd-featured-cover-area">
               <button
                 className="vd-featured-cover-frame"
                 onClick={() =>
@@ -384,10 +364,8 @@ Please provide the purchase details.`;
                 type="button"
                 aria-label={`View ${featuredBook.title}`}
               >
-
                 {featuredBook.coverImageUrl ||
                 featuredBook.coverUrl ? (
-
                   <img
                     src={
                       featuredBook.coverImageUrl ||
@@ -398,27 +376,22 @@ Please provide the purchase details.`;
                       "Book cover"
                     }
                   />
-
                 ) : (
-
                   <div className="vd-cover-placeholder">
                     <BookOpen size={55} />
                   </div>
-
                 )}
 
                 <span className="vd-cover-read-badge">
                   <BookOpen size={15} />
                   View Book
                 </span>
-
               </button>
-
             </div>
 
+            {/* CONTENT */}
 
             <div className="vd-featured-content">
-
               <div className="vd-featured-tag">
                 <Sparkles size={15} />
                 FEATURED BOOK
@@ -439,7 +412,6 @@ Please provide the purchase details.`;
                     getCategoryColor(
                       featuredBook.category
                     ).bg,
-
                   color:
                     getCategoryColor(
                       featuredBook.category
@@ -454,29 +426,19 @@ Please provide the purchase details.`;
                   "Explore this wonderful book from Viyazham Publication."}
               </p>
 
-              <div className="vd-featured-footer">
+              {/* FEATURED FOOTER */}
 
+              <div className="vd-featured-footer">
                 <div className="vd-featured-price">
                   {getPrice(featuredBook)}
                 </div>
 
                 <div className="vd-featured-actions">
 
-                  <button
-                    className="vd-primary-btn"
-                    onClick={() =>
-                      handleBuyNow(
-                        featuredBook
-                      )
-                    }
-                    type="button"
-                  >
-                    <ShoppingBag size={17} />
-                    Buy Now
-                  </button>
+                  {/* VIEW DETAILS */}
 
                   <button
-                    className="vd-outline-btn"
+                    className="vd-secondary-btn"
                     onClick={() =>
                       navigate(
                         `/books/${featuredBook.id}`
@@ -484,31 +446,37 @@ Please provide the purchase details.`;
                     }
                     type="button"
                   >
-                    <Eye size={17} />
                     View Details
+                    <ArrowRight size={17} />
+                  </button>
+
+                  {/* BUY */}
+
+                  <button
+                    className="vd-primary-btn"
+                    onClick={() =>
+                      handleBuyNow(featuredBook)
+                    }
+                    type="button"
+                  >
+                    <MessageCircle size={17} />
+                    Buy Now
                   </button>
 
                 </div>
-
               </div>
-
             </div>
-
           </section>
-
         )}
 
-
-        {/* =================================================
+        {/* ==========================================
             BOOK COLLECTION
-        ================================================= */}
+        ========================================== */}
 
         <section className="vd-books-section">
 
           <div className="vd-section-header">
-
             <div>
-
               <span className="vd-small-label">
                 OUR COLLECTION
               </span>
@@ -518,9 +486,9 @@ Please provide the purchase details.`;
               </h2>
 
               <p>
-                Explore the latest books published by Viyazham.
+                Explore the latest books published by
+                Viyazham.
               </p>
-
             </div>
 
             <button
@@ -533,14 +501,12 @@ Please provide the purchase details.`;
               View All Books
               <ArrowRight size={17} />
             </button>
-
           </div>
 
+          {/* EMPTY */}
 
           {books.length === 0 ? (
-
             <div className="vd-empty">
-
               <div className="vd-empty-icon">
                 <BookOpen size={35} />
               </div>
@@ -550,33 +516,30 @@ Please provide the purchase details.`;
               </h3>
 
               <p>
-                New books will appear here once they are published.
+                New books will appear here once they
+                are published.
               </p>
-
             </div>
-
           ) : (
 
+            /* BOOK GRID */
+
             <div className="vd-book-grid">
-
               {recentBooks.map((book) => {
-
                 const categoryColor =
                   getCategoryColor(
                     book.category
                   );
 
                 return (
-
                   <article
                     className="vd-book-card"
                     key={book.id}
                   >
 
-                    {/* =================================================
+                    {/* ==================================
                         BOOK COVER
-                        CLICKING COVER → BOOK DETAILS
-                    ================================================= */}
+                    ================================== */}
 
                     <button
                       className="vd-book-cover"
@@ -588,12 +551,10 @@ Please provide the purchase details.`;
                       type="button"
                       aria-label={`View ${book.title}`}
                     >
-
                       <div className="vd-book-cover-inner">
 
                         {book.coverImageUrl ||
                         book.coverUrl ? (
-
                           <img
                             src={
                               book.coverImageUrl ||
@@ -605,13 +566,10 @@ Please provide the purchase details.`;
                             }
                             loading="lazy"
                           />
-
                         ) : (
-
                           <div className="vd-cover-placeholder">
                             <BookOpen size={40} />
                           </div>
-
                         )}
 
                         <span className="vd-cover-overlay">
@@ -620,13 +578,11 @@ Please provide the purchase details.`;
                         </span>
 
                       </div>
-
                     </button>
 
-
-                    {/* =================================================
-                        BOOK DETAILS
-                    ================================================= */}
+                    {/* ==================================
+                        BOOK INFORMATION
+                    ================================== */}
 
                     <div className="vd-book-info">
 
@@ -635,7 +591,6 @@ Please provide the purchase details.`;
                         style={{
                           backgroundColor:
                             categoryColor.bg,
-
                           color:
                             categoryColor.text,
                         }}
@@ -657,6 +612,8 @@ Please provide the purchase details.`;
                           "Discover this book from Viyazham Publication."}
                       </p>
 
+                      {/* BOOK FOOTER */}
+
                       <div className="vd-book-footer">
 
                         <strong>
@@ -670,30 +627,25 @@ Please provide the purchase details.`;
                           }
                           type="button"
                         >
-                          <ShoppingBag size={14} />
+                          <MessageCircle size={15} />
                           Buy
                         </button>
 
                       </div>
-
                     </div>
 
                   </article>
                 );
               })}
-
             </div>
           )}
-
         </section>
 
-
-        {/* =================================================
+        {/* ==========================================
             BROWSE ALL
-        ================================================= */}
+        ========================================== */}
 
         {books.length > 0 && (
-
           <button
             className="vd-browse-all"
             onClick={() =>
@@ -702,36 +654,32 @@ Please provide the purchase details.`;
             type="button"
           >
             <BookOpen size={18} />
-
             Browse All Books
-
             <ArrowRight size={18} />
           </button>
-
         )}
 
       </div>
 
-
-      {/* =================================================
+      {/* ==========================================
           WHATSAPP PURCHASE MODAL
-      ================================================= */}
+      ========================================== */}
 
       {selectedBook && (
-
         <div
           className="vd-modal-overlay"
           onClick={() =>
             setSelectedBook(null)
           }
         >
-
           <div
             className="vd-modal"
             onClick={(event) =>
               event.stopPropagation()
             }
           >
+
+            {/* CLOSE */}
 
             <button
               className="vd-modal-close"
@@ -744,6 +692,7 @@ Please provide the purchase details.`;
               <X size={20} />
             </button>
 
+            {/* ICON */}
 
             <div className="vd-modal-icon">
               <MessageCircle size={27} />
@@ -758,17 +707,17 @@ Please provide the purchase details.`;
             </h2>
 
             <p className="vd-modal-subtitle">
-              Contact us on WhatsApp to purchase this book.
+              Contact us on WhatsApp to purchase
+              this book.
             </p>
 
+            {/* SELECTED BOOK */}
 
             <div className="vd-selected-book">
 
               <div className="vd-selected-cover">
-
                 {selectedBook.coverImageUrl ||
                 selectedBook.coverUrl ? (
-
                   <img
                     src={
                       selectedBook.coverImageUrl ||
@@ -779,15 +728,10 @@ Please provide the purchase details.`;
                       "Book cover"
                     }
                   />
-
                 ) : (
-
                   <BookOpen size={25} />
-
                 )}
-
               </div>
-
 
               <div className="vd-selected-info">
 
@@ -804,31 +748,25 @@ Please provide the purchase details.`;
                 </strong>
 
               </div>
-
             </div>
 
+            {/* WHATSAPP OPTIONS */}
 
             <div className="vd-whatsapp-options">
-
               {whatsappNumbers.map((item) => (
-
                 <button
                   className="vd-whatsapp-option"
                   key={item.number}
                   onClick={() =>
-                    openWhatsApp(
-                      item.number
-                    )
+                    openWhatsApp(item.number)
                   }
                   type="button"
                 >
-
                   <div className="vd-whatsapp-icon">
                     <MessageCircle size={20} />
                   </div>
 
                   <div className="vd-whatsapp-info">
-
                     <strong>
                       {item.name}
                     </strong>
@@ -836,17 +774,14 @@ Please provide the purchase details.`;
                     <span>
                       {item.display}
                     </span>
-
                   </div>
 
                   <ChevronRight size={18} />
-
                 </button>
-
               ))}
-
             </div>
 
+            {/* CANCEL */}
 
             <button
               className="vd-cancel"
@@ -859,7 +794,6 @@ Please provide the purchase details.`;
             </button>
 
           </div>
-
         </div>
       )}
 
