@@ -37,7 +37,7 @@ The website includes book information such as:
 
 - 🔑 Admin login
 - ➕ Add new books
-- 🖼️ Upload book cover
+- 🖼️ Upload book covers
 - 📄 Upload PDF, DOC and DOCX files
 - ✏️ Edit uploaded book information
 - 🗑️ Delete books
