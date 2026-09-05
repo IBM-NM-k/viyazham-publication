@@ -1,14 +1,42 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
+import { ArrowLeft } from "lucide-react";
 
-// Every route renders inside this Layout. Header stays mounted once and
-// never re-renders on navigation; <Outlet /> is where React Router injects
-// whichever page component matches the current URL.
-// A <Footer /> can be added here later without touching any page.
 function Layout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Don't show Back button on Home page
+  const showBackButton = location.pathname !== "/";
+
   return (
     <>
       <Header />
+
+      {showBackButton && (
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          style={{
+            margin: "18px 5%",
+            padding: "9px 15px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "7px",
+            border: "1px solid #7B1E3C",
+            borderRadius: "9px",
+            background: "#fffdf8",
+            color: "#7B1E3C",
+            fontSize: "14px",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          <ArrowLeft size={17} />
+          Back
+        </button>
+      )}
+
       <Outlet />
     </>
   );
