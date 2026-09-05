@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   BookOpen,
   Plus,
@@ -10,35 +11,39 @@ import {
   Pencil,
 } from "lucide-react";
 
-const STORAGE_KEY = "viyazham_uploaded_books";
+import {
+  getUploadedBooks,
+  deleteBook,
+} from "../services/booksService";
+
+import { supabase } from "../services/supabaseClient";
 
 function Admin() {
   const navigate = useNavigate();
 
   const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // =====================================================
-  // LOAD UPLOADED BOOKS
+  // LOAD BOOKS FROM SUPABASE
   // =====================================================
 
-  const loadBooks = () => {
+  const loadBooks = async () => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      setLoading(true);
 
-      if (stored) {
-        const parsedBooks = JSON.parse(stored);
+      const uploadedBooks = await getUploadedBooks();
 
-        if (Array.isArray(parsedBooks)) {
-          setBooks(parsedBooks);
-        } else {
-          setBooks([]);
-        }
-      } else {
-        setBooks([]);
-      }
+      setBooks(uploadedBooks || []);
     } catch (error) {
-      console.error("Unable to load uploaded books:", error);
+      console.error(
+        "Unable to load uploaded books:",
+        error
+      );
+
       setBooks([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,7 +55,7 @@ function Admin() {
   // DELETE BOOK
   // =====================================================
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this book?"
     );
@@ -60,20 +65,16 @@ function Admin() {
     }
 
     try {
-      const updatedBooks = books.filter(
-        (book) => String(book.id) !== String(id)
-      );
+      await deleteBook(id);
 
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(updatedBooks)
-      );
-
-      setBooks(updatedBooks);
+      await loadBooks();
 
       alert("Book deleted successfully.");
     } catch (error) {
-      console.error("Unable to delete book:", error);
+      console.error(
+        "Unable to delete book:",
+        error
+      );
 
       alert("Unable to delete the book.");
     }
@@ -84,14 +85,6 @@ function Admin() {
   // =====================================================
 
   const handleEdit = (book) => {
-    /*
-      We send the selected book to AddBook through
-      React Router state.
-
-      Your AddBook.jsx can then read this book and
-      automatically fill the form.
-    */
-
     navigate("/admin/books/add", {
       state: {
         editBook: book,
@@ -103,8 +96,19 @@ function Admin() {
   // LOGOUT
   // =====================================================
 
-  const handleLogout = () => {
-    navigate("/admin-login");
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+
+      navigate("/login", {
+        replace: true,
+      });
+    } catch (error) {
+      console.error(
+        "Logout error:",
+        error
+      );
+    }
   };
 
   // =====================================================
@@ -114,6 +118,10 @@ function Admin() {
   const handleViewBook = (id) => {
     navigate(`/books/${id}`);
   };
+
+  // =====================================================
+  // RENDER
+  // =====================================================
 
   return (
     <main
@@ -129,7 +137,6 @@ function Admin() {
           margin: "0 auto",
         }}
       >
-
         {/* =================================================
             HEADER
         ================================================= */}
@@ -179,6 +186,7 @@ function Admin() {
 
           <button
             onClick={handleLogout}
+            type="button"
             style={{
               display: "flex",
               alignItems: "center",
@@ -209,8 +217,9 @@ function Admin() {
             marginBottom: "45px",
           }}
         >
-
-          {/* ADD BOOK CARD */}
+          {/* =================================================
+              ADD BOOK CARD
+          ================================================= */}
 
           <div
             style={{
@@ -260,6 +269,7 @@ function Admin() {
               onClick={() =>
                 navigate("/admin/books/add")
               }
+              type="button"
               style={{
                 width: "100%",
                 marginTop: "15px",
@@ -281,7 +291,9 @@ function Admin() {
             </button>
           </div>
 
-          {/* VIEW BOOKS CARD */}
+          {/* =================================================
+              VIEW BOOKS CARD
+          ================================================= */}
 
           <div
             style={{
@@ -333,6 +345,7 @@ function Admin() {
               onClick={() =>
                 navigate("/books")
               }
+              type="button"
               style={{
                 width: "100%",
                 marginTop: "15px",
@@ -360,7 +373,6 @@ function Admin() {
         ================================================= */}
 
         <section>
-
           <div
             style={{
               display: "flex",
@@ -391,10 +403,42 @@ function Admin() {
           </div>
 
           {/* =================================================
-              EMPTY STATE
+              LOADING
           ================================================= */}
 
-          {books.length === 0 ? (
+          {loading ? (
+            <div
+              style={{
+                background: "white",
+                border: "1px solid #e5e1db",
+                borderRadius: "18px",
+                padding: "60px 30px",
+                textAlign: "center",
+              }}
+            >
+              <BookOpen
+                size={45}
+                color="#aaa"
+              />
+
+              <h3>
+                Loading books...
+              </h3>
+
+              <p
+                style={{
+                  color: "#777",
+                }}
+              >
+                Please wait while we load your
+                published books.
+              </p>
+            </div>
+          ) : books.length === 0 ? (
+
+            /* =================================================
+               EMPTY STATE
+            ================================================= */
 
             <div
               style={{
@@ -427,6 +471,7 @@ function Admin() {
                 onClick={() =>
                   navigate("/admin/books/add")
                 }
+                type="button"
                 style={{
                   marginTop: "10px",
                   border: "none",
@@ -454,9 +499,7 @@ function Admin() {
                 gap: "18px",
               }}
             >
-
               {books.map((book) => (
-
                 <div
                   key={book.id}
                   style={{
@@ -472,10 +515,9 @@ function Admin() {
                       "0 6px 20px rgba(0,0,0,0.03)",
                   }}
                 >
-
-                  {/* =========================================
+                  {/* =================================================
                       DELETE BUTTON
-                  ========================================= */}
+                  ================================================= */}
 
                   <button
                     onClick={() =>
@@ -483,6 +525,7 @@ function Admin() {
                     }
                     title="Delete this book"
                     aria-label={`Delete ${book.title}`}
+                    type="button"
                     style={{
                       width: "48px",
                       height: "48px",
@@ -501,16 +544,12 @@ function Admin() {
                     <Trash2 size={21} />
                   </button>
 
-                  {/* =========================================
+                  {/* =================================================
                       BOOK COVER
+                  ================================================= */}
 
-                      IMPORTANT:
-                      AddBook.jsx uses coverImageUrl.
-                      We also keep coverUrl as fallback.
-                  ========================================= */}
-
-                  {book.coverImageUrl || book.coverUrl ? (
-
+                  {book.coverImageUrl ||
+                  book.coverUrl ? (
                     <img
                       src={
                         book.coverImageUrl ||
@@ -528,9 +567,7 @@ function Admin() {
                           "0 5px 15px rgba(0,0,0,0.12)",
                       }}
                     />
-
                   ) : (
-
                     <div
                       style={{
                         width: "110px",
@@ -548,12 +585,11 @@ function Admin() {
                         color="#aaa"
                       />
                     </div>
-
                   )}
 
-                  {/* =========================================
+                  {/* =================================================
                       BOOK DETAILS
-                  ========================================= */}
+                  ================================================= */}
 
                   <div
                     style={{
@@ -561,7 +597,6 @@ function Admin() {
                       minWidth: 0,
                     }}
                   >
-
                     {/* CATEGORY */}
 
                     <div
@@ -588,7 +623,8 @@ function Admin() {
                         color: "#171717",
                       }}
                     >
-                      {book.title}
+                      {book.title ||
+                        "Untitled Book"}
                     </h3>
 
                     {/* AUTHOR */}
@@ -631,7 +667,8 @@ function Admin() {
                     {/* PRICE */}
 
                     {book.price !== null &&
-                      book.price !== undefined && (
+                      book.price !== undefined &&
+                      book.price !== "" && (
                         <p
                           style={{
                             margin: "0 0 8px",
@@ -639,7 +676,10 @@ function Admin() {
                             fontWeight: "700",
                           }}
                         >
-                          ₹ {Number(book.price).toFixed(2)}
+                          ₹{" "}
+                          {Number(
+                            book.price
+                          ).toFixed(2)}
                         </p>
                       )}
 
@@ -650,12 +690,9 @@ function Admin() {
                         margin: 0,
                         color: "#888",
                         fontSize: "13px",
-                        overflow:
-                          "hidden",
-                        textOverflow:
-                          "ellipsis",
-                        whiteSpace:
-                          "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {book.fileName ||
@@ -686,12 +723,11 @@ function Admin() {
 
                       Published
                     </div>
-
                   </div>
 
-                  {/* =========================================
+                  {/* =================================================
                       ACTION BUTTONS
-                  ========================================= */}
+                  ================================================= */}
 
                   <div
                     style={{
@@ -701,7 +737,6 @@ function Admin() {
                       flexShrink: 0,
                     }}
                   >
-
                     {/* EDIT */}
 
                     <button
@@ -709,6 +744,7 @@ function Admin() {
                         handleEdit(book)
                       }
                       title="Edit this book"
+                      type="button"
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -717,8 +753,7 @@ function Admin() {
                         border:
                           "1px solid #d8c8ae",
                         background: "#faf6ef",
-                        padding:
-                          "10px 14px",
+                        padding: "10px 14px",
                         borderRadius: "9px",
                         cursor: "pointer",
                         color: "#6b563b",
@@ -738,6 +773,7 @@ function Admin() {
                         )
                       }
                       title="View this book"
+                      type="button"
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -746,8 +782,7 @@ function Admin() {
                         border:
                           "1px solid #ddd",
                         background: "white",
-                        padding:
-                          "10px 14px",
+                        padding: "10px 14px",
                         borderRadius: "9px",
                         cursor: "pointer",
                         color: "#333",
@@ -757,16 +792,11 @@ function Admin() {
                       <Eye size={17} />
                       View
                     </button>
-
                   </div>
-
                 </div>
-
               ))}
-
             </div>
           )}
-
         </section>
 
         {/* =================================================
@@ -777,6 +807,7 @@ function Admin() {
           onClick={() =>
             navigate("/")
           }
+          type="button"
           style={{
             marginTop: "35px",
             display: "flex",
@@ -791,7 +822,6 @@ function Admin() {
           <ArrowLeft size={17} />
           Back to Website
         </button>
-
       </div>
     </main>
   );
