@@ -11,7 +11,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { getAllBooks } from "../services/booksService";
+import { getPublishedBooks } from "../services/booksService";
 import { supabase } from "../services/supabaseClient";
 
 import "./UserDashboard.css";
@@ -171,31 +171,51 @@ function UserDashboard() {
   }, [navigate]);
 
   // ==========================================
-  // LOAD ALL BOOKS
+  // LOAD PUBLISHED BOOKS
   // ==========================================
 
   useEffect(() => {
+    let mounted = true;
+
     const loadBooks = async () => {
       try {
-        const allBooks = await getAllBooks();
+        const publishedBooks = await getPublishedBooks();
 
-        const publishedBooks = (allBooks || []).filter(
-          (book) =>
-            book.status === "published" ||
-            !book.status
+        if (!mounted) return;
+
+        /*
+          IMPORTANT:
+
+          getPublishedBooks() already returns books
+          from Supabase in this order:
+
+          newest → oldest
+
+          because booksService.js uses:
+
+          order("created_at", { ascending: false })
+
+          Therefore DO NOT reverse the array.
+        */
+
+        setBooks(publishedBooks || []);
+      } catch (error) {
+        console.error(
+          "Failed to load published books:",
+          error
         );
 
-        // Newest uploaded book first
-        const latestBooks = [...publishedBooks].reverse();
-
-        setBooks(latestBooks);
-      } catch (error) {
-        console.error("Failed to load books:", error);
-        setBooks([]);
+        if (mounted) {
+          setBooks([]);
+        }
       }
     };
 
     loadBooks();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // ==========================================
@@ -279,11 +299,17 @@ Please provide the purchase details.`;
   // BOOK DATA
   // ==========================================
 
-  // Newest uploaded book
+  /*
+    books[0] is ALWAYS the newest published book.
+
+    Therefore:
+    - Featured Book = newest book
+    - Recently Added = newest 8 books
+  */
+
   const featuredBook =
     books.length > 0 ? books[0] : null;
 
-  // Newest 8 books
   const recentBooks = books.slice(0, 8);
 
   return (
@@ -412,6 +438,7 @@ Please provide the purchase details.`;
                     getCategoryColor(
                       featuredBook.category
                     ).bg,
+
                   color:
                     getCategoryColor(
                       featuredBook.category
@@ -591,6 +618,7 @@ Please provide the purchase details.`;
                         style={{
                           backgroundColor:
                             categoryColor.bg,
+
                           color:
                             categoryColor.text,
                         }}
