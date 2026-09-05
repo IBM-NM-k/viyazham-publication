@@ -4,7 +4,7 @@ import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 import BookGrid from "../components/BookGrid";
 import Loader from "../components/Loader";
-import { LogIn, ShoppingBag } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./Explore.css";
 
@@ -17,14 +17,19 @@ function Explore() {
 
   const navigate = useNavigate();
 
-  // Load categories
+  // =========================
+  // LOAD CATEGORIES
+  // =========================
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
 
-  // Search books
+  // =========================
+  // SEARCH BOOKS
+  // =========================
   useEffect(() => {
     let isCurrent = true;
+
     setIsLoading(true);
 
     searchBooks({ query, category }).then((results) => {
@@ -43,19 +48,27 @@ function Explore() {
     <main className="explore">
 
       {/* ================= HEADER ================= */}
-      <div className="explore-header">
-        <div className="section-label">Our Collection</div>
 
-        <h1>Explore Books</h1>
+      <div className="explore-header">
+
+        <div className="section-label">
+          Our Collection
+        </div>
+
+        <h1>
+          Explore Books
+        </h1>
 
         <p>
-  Discover books published by{" "}
-  <strong>Viyazham Publication.</strong>
-</p>
+          Discover books published by{" "}
+          <strong>Viyazham Publication.</strong>
+        </p>
+
       </div>
 
 
       {/* ================= SEARCH & CATEGORY ================= */}
+
       <div className="explore-controls">
 
         <SearchBar
@@ -73,9 +86,8 @@ function Explore() {
 
 
       {/* ================= LOGIN / BUY INFORMATION ================= */}
-      <section className="purchase-info">
 
-        
+      <section className="purchase-info">
 
         <div className="purchase-info-content">
 
@@ -85,24 +97,28 @@ function Explore() {
 
           <p>
             Please log in to your account before purchasing a book.
-            After logging in, you can select <strong>Buy Now</strong>
+            After logging in, you can select{" "}
+            <strong>Buy Now</strong>{" "}
             to place your order.
           </p>
 
         </div>
 
+
         <button
+          type="button"
           className="purchase-login-btn"
           onClick={() => navigate("/login")}
         >
           <LogIn size={18} />
-          Login to Buy
+          <span>Login to Buy</span>
         </button>
 
       </section>
 
 
       {/* ================= BOOKS ================= */}
+
       {isLoading ? (
         <Loader label="Loading books..." />
       ) : (
