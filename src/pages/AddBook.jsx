@@ -999,11 +999,9 @@ function AddBook() {
       // SCROLL TO MANAGE BOOKS
       // =================================================
 
-      setTimeout(() => {
+            setTimeout(() => {
         const manageSection =
-          document.getElementById(
-            "manage-books",
-          );
+          document.getElementById("manage-books");
 
         if (manageSection) {
           manageSection.scrollIntoView({
@@ -1012,19 +1010,17 @@ function AddBook() {
         }
       }, 500);
     } catch (error) {
-      console.error(
-        "Book publishing error:",
-        error
-      );
+      console.error("Book publishing error:", error);
 
       setMessage(
-        "Unable to save the book. Please check your connection and try again."
+        error?.message ||
+          error?.error_description ||
+          "Unable to save the book. Please try again."
       );
     } finally {
       setIsPublishing(false);
     }
-  };
-
+  }
   // =====================================================
   // EDIT BOOK
   // =====================================================

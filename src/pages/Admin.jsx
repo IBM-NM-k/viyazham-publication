@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import {
   BookOpen,
   Plus,
@@ -36,11 +35,7 @@ function Admin() {
 
       setBooks(uploadedBooks || []);
     } catch (error) {
-      console.error(
-        "Unable to load uploaded books:",
-        error
-      );
-
+      console.error("Unable to load uploaded books:", error);
       setBooks([]);
     } finally {
       setLoading(false);
@@ -71,10 +66,7 @@ function Admin() {
 
       alert("Book deleted successfully.");
     } catch (error) {
-      console.error(
-        "Unable to delete book:",
-        error
-      );
+      console.error("Unable to delete book:", error);
 
       alert("Unable to delete the book.");
     }
@@ -104,10 +96,7 @@ function Admin() {
         replace: true,
       });
     } catch (error) {
-      console.error(
-        "Logout error:",
-        error
-      );
+      console.error("Logout error:", error);
     }
   };
 
@@ -120,8 +109,49 @@ function Admin() {
   };
 
   // =====================================================
-  // RENDER
+  // LOADING
   // =====================================================
+
+  if (loading) {
+    return (
+      <main
+        style={{
+          minHeight: "calc(100vh - 90px)",
+          background: "#f7f3ed",
+          padding: "60px 25px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            color: "#555",
+          }}
+        >
+          <BookOpen
+            size={45}
+            color="#999"
+            style={{ marginBottom: "15px" }}
+          />
+
+          <h2
+            style={{
+              margin: 0,
+              color: "#171717",
+            }}
+          >
+            Loading books...
+          </h2>
+
+          <p>
+            Please wait while we load your published books.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main
@@ -137,6 +167,7 @@ function Admin() {
           margin: "0 auto",
         }}
       >
+
         {/* =================================================
             HEADER
         ================================================= */}
@@ -217,9 +248,8 @@ function Admin() {
             marginBottom: "45px",
           }}
         >
-          {/* =================================================
-              ADD BOOK CARD
-          ================================================= */}
+
+          {/* ADD BOOK */}
 
           <div
             style={{
@@ -247,11 +277,7 @@ function Admin() {
               <Plus size={27} />
             </div>
 
-            <h2
-              style={{
-                margin: "0 0 8px",
-              }}
-            >
+            <h2 style={{ margin: "0 0 8px" }}>
               Add New Book
             </h2>
 
@@ -291,9 +317,7 @@ function Admin() {
             </button>
           </div>
 
-          {/* =================================================
-              VIEW BOOKS CARD
-          ================================================= */}
+          {/* PUBLISHED BOOKS */}
 
           <div
             style={{
@@ -321,11 +345,7 @@ function Admin() {
               <BookOpen size={27} />
             </div>
 
-            <h2
-              style={{
-                margin: "0 0 8px",
-              }}
-            >
+            <h2 style={{ margin: "0 0 8px" }}>
               Published Books
             </h2>
 
@@ -342,9 +362,7 @@ function Admin() {
             </p>
 
             <button
-              onClick={() =>
-                navigate("/books")
-              }
+              onClick={() => navigate("/books")}
               type="button"
               style={{
                 width: "100%",
@@ -375,82 +393,45 @@ function Admin() {
         <section>
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
               marginBottom: "20px",
             }}
           >
-            <div>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "25px",
-                }}
-              >
-                Manage Books
-              </h2>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "25px",
+              }}
+            >
+              Manage Books
+            </h2>
 
-              <p
-                style={{
-                  color: "#777",
-                  marginTop: "5px",
-                }}
-              >
-                Books uploaded through the admin panel.
-              </p>
-            </div>
+            <p
+              style={{
+                color: "#777",
+                marginTop: "5px",
+              }}
+            >
+              Books uploaded through the admin panel.
+            </p>
           </div>
 
           {/* =================================================
-              LOADING
+              EMPTY STATE
           ================================================= */}
 
-          {loading ? (
-            <div
-              style={{
-                background: "white",
-                border: "1px solid #e5e1db",
-                borderRadius: "18px",
-                padding: "60px 30px",
-                textAlign: "center",
-              }}
-            >
-              <BookOpen
-                size={45}
-                color="#aaa"
-              />
-
-              <h3>
-                Loading books...
-              </h3>
-
-              <p
-                style={{
-                  color: "#777",
-                }}
-              >
-                Please wait while we load your
-                published books.
-              </p>
-            </div>
-          ) : books.length === 0 ? (
-
-            /* =================================================
-               EMPTY STATE
-            ================================================= */
+          {books.length === 0 ? (
 
             <div
               style={{
                 background: "white",
                 border: "1px solid #e5e1db",
                 borderRadius: "18px",
-                padding: "50px",
+                padding: "70px 30px",
                 textAlign: "center",
               }}
             >
               <BookOpen
-                size={45}
+                size={55}
                 color="#aaa"
               />
 
@@ -463,8 +444,7 @@ function Admin() {
                   color: "#777",
                 }}
               >
-                Upload your first book to see
-                it here.
+                Upload your first book to see it here.
               </p>
 
               <button
@@ -499,7 +479,9 @@ function Admin() {
                 gap: "18px",
               }}
             >
+
               {books.map((book) => (
+
                 <div
                   key={book.id}
                   style={{
@@ -515,9 +497,8 @@ function Admin() {
                       "0 6px 20px rgba(0,0,0,0.03)",
                   }}
                 >
-                  {/* =================================================
-                      DELETE BUTTON
-                  ================================================= */}
+
+                  {/* DELETE */}
 
                   <button
                     onClick={() =>
@@ -544,12 +525,11 @@ function Admin() {
                     <Trash2 size={21} />
                   </button>
 
-                  {/* =================================================
-                      BOOK COVER
-                  ================================================= */}
+                  {/* COVER */}
 
                   {book.coverImageUrl ||
                   book.coverUrl ? (
+
                     <img
                       src={
                         book.coverImageUrl ||
@@ -567,7 +547,9 @@ function Admin() {
                           "0 5px 15px rgba(0,0,0,0.12)",
                       }}
                     />
+
                   ) : (
+
                     <div
                       style={{
                         width: "110px",
@@ -587,9 +569,7 @@ function Admin() {
                     </div>
                   )}
 
-                  {/* =================================================
-                      BOOK DETAILS
-                  ================================================= */}
+                  {/* DETAILS */}
 
                   <div
                     style={{
@@ -597,8 +577,6 @@ function Admin() {
                       minWidth: 0,
                     }}
                   >
-                    {/* CATEGORY */}
-
                     <div
                       style={{
                         display: "inline-block",
@@ -614,8 +592,6 @@ function Admin() {
                         "Uncategorized"}
                     </div>
 
-                    {/* TITLE */}
-
                     <h3
                       style={{
                         margin: "0 0 8px",
@@ -623,11 +599,8 @@ function Admin() {
                         color: "#171717",
                       }}
                     >
-                      {book.title ||
-                        "Untitled Book"}
+                      {book.title}
                     </h3>
-
-                    {/* AUTHOR */}
 
                     <p
                       style={{
@@ -640,8 +613,6 @@ function Admin() {
                         book.author ||
                         "Unknown Author"}
                     </p>
-
-                    {/* LANGUAGE + PAGES */}
 
                     {(book.language ||
                       book.pages) && (
@@ -664,26 +635,19 @@ function Admin() {
                       </p>
                     )}
 
-                    {/* PRICE */}
-
                     {book.price !== null &&
-                      book.price !== undefined &&
-                      book.price !== "" && (
-                        <p
-                          style={{
-                            margin: "0 0 8px",
-                            color: "#171717",
-                            fontWeight: "700",
-                          }}
-                        >
-                          ₹{" "}
-                          {Number(
-                            book.price
-                          ).toFixed(2)}
-                        </p>
-                      )}
-
-                    {/* FILE */}
+                    book.price !== undefined &&
+                    book.price !== "" && (
+                      <p
+                        style={{
+                          margin: "0 0 8px",
+                          color: "#171717",
+                          fontWeight: "700",
+                        }}
+                      >
+                        ₹ {Number(book.price).toFixed(2)}
+                      </p>
+                    )}
 
                     <p
                       style={{
@@ -698,8 +662,6 @@ function Admin() {
                       {book.fileName ||
                         "Book file uploaded"}
                     </p>
-
-                    {/* STATUS */}
 
                     <div
                       style={{
@@ -721,13 +683,11 @@ function Admin() {
                         }}
                       />
 
-                      Published
+                      {book.status || "Published"}
                     </div>
                   </div>
 
-                  {/* =================================================
-                      ACTION BUTTONS
-                  ================================================= */}
+                  {/* ACTIONS */}
 
                   <div
                     style={{
@@ -737,14 +697,13 @@ function Admin() {
                       flexShrink: 0,
                     }}
                   >
-                    {/* EDIT */}
 
                     <button
                       onClick={() =>
                         handleEdit(book)
                       }
-                      title="Edit this book"
                       type="button"
+                      title="Edit this book"
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -764,16 +723,12 @@ function Admin() {
                       Edit
                     </button>
 
-                    {/* VIEW */}
-
                     <button
                       onClick={() =>
-                        handleViewBook(
-                          book.id
-                        )
+                        handleViewBook(book.id)
                       }
-                      title="View this book"
                       type="button"
+                      title="View this book"
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -804,9 +759,7 @@ function Admin() {
         ================================================= */}
 
         <button
-          onClick={() =>
-            navigate("/")
-          }
+          onClick={() => navigate("/")}
           type="button"
           style={{
             marginTop: "35px",
