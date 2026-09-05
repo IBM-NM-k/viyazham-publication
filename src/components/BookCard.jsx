@@ -1,25 +1,108 @@
 import { Link } from "react-router-dom";
+import { ArrowRight, BookOpen } from "lucide-react";
+
 import "./BookCard.css";
 
-// Renders one book as a clickable card linking to its details page.
-// Used by BookGrid, and can also be used standalone (e.g. Home's featured section).
 function BookCard({ book }) {
+  // =========================================================
+  // AUTHOR NAME
+  // Supports both:
+  // author: "Author Name"
+  // and:
+  // author: { name: "Author Name" }
+  // =========================================================
+
+  const authorName =
+    typeof book?.author === "string"
+      ? book.author
+      : book?.author?.name ||
+        book?.author?.fullName ||
+        book?.author?.displayName ||
+        "Unknown Author";
+
+  // =========================================================
+  // PAGE COUNT
+  // =========================================================
+
+  const pageCount =
+    book?.pages !== undefined &&
+    book?.pages !== null &&
+    book?.pages !== ""
+      ? book.pages
+      : "—";
+
   return (
-    <Link to={`/books/${book.id}`} className="book-card">
+    <Link
+      to={`/books/${book.id}`}
+      className="book-card"
+      aria-label={`View ${book.title || "book"}`}
+    >
+      {/* =====================================================
+          BOOK COVER
+          ===================================================== */}
+
       <div className="book-card-cover">
-        {book.coverImageUrl ? (
-          <img src={book.coverImageUrl} alt={`${book.title} cover`} />
+        {book?.coverImageUrl || book?.coverUrl ? (
+          <img
+            src={book.coverImageUrl || book.coverUrl}
+            alt={`${book.title || "Book"} cover`}
+          />
         ) : (
           <div className="book-card-cover-fallback">
-            <span>{book.title}</span>
+            <BookOpen size={42} />
+            <span>{book?.title || "Untitled Book"}</span>
           </div>
         )}
       </div>
 
+      {/* =====================================================
+          BOOK INFORMATION
+          ===================================================== */}
+
       <div className="book-card-info">
-        <span className="book-card-category">{book.category}</span>
-        <h3 className="book-card-title">{book.title}</h3>
-        <p className="book-card-author">{book.author.name}</p>
+
+        {/* CATEGORY */}
+
+        <span className="book-card-category">
+          {book?.category || "Book"}
+        </span>
+
+        {/* TITLE */}
+
+        <h3 className="book-card-title">
+          {book?.title || "Untitled Book"}
+        </h3>
+
+        {/* AUTHOR */}
+
+        <p className="book-card-author">
+          By {authorName}
+        </p>
+
+        {/* ===================================================
+            BOTTOM
+            ONLY PAGES + ARROW
+            =================================================== */}
+
+        <div className="book-card-bottom">
+
+          <div className="book-card-pages">
+            <BookOpen size={15} />
+
+            <span>
+              {pageCount}{" "}
+              {pageCount === 1 ? "Page" : "Pages"}
+            </span>
+          </div>
+
+          <span
+            className="book-card-arrow"
+            aria-hidden="true"
+          >
+            <ArrowRight size={18} />
+          </span>
+
+        </div>
       </div>
     </Link>
   );

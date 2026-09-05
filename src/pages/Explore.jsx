@@ -49,8 +49,9 @@ function Explore() {
         <h1>Explore Books</h1>
 
         <p>
-          Discover books published by Viyazham Publication.
-        </p>
+  Discover books published by{" "}
+  <strong>Viyazham Publication.</strong>
+</p>
       </div>
 
 
@@ -74,9 +75,7 @@ function Explore() {
       {/* ================= LOGIN / BUY INFORMATION ================= */}
       <section className="purchase-info">
 
-        <div className="purchase-info-icon">
-          <ShoppingBag size={24} />
-        </div>
+        
 
         <div className="purchase-info-content">
 

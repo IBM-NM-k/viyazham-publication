@@ -1,106 +1,485 @@
 /* =========================================================
-   EXPLORE PAGE
+   VIYAZHAM PUBLICATION
+   PREMIUM EDITORIAL EXPLORE PAGE
+   Inspired by the provided reference design
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
    ========================================================= */
 
 .explore {
-  min-height: 80vh;
-  padding: 90px 9% 110px;
-  background: #faf7f2;
+  --ivory: #fcfaf5;
+  --paper: #fffdf9;
+  --paper-warm: #f8f0e4;
+
+  --brown: #432b20;
+  --brown-soft: #73594a;
+
+  --wine: #7d1f38;
+  --wine-dark: #5c162a;
+
+  --gold: #c99a50;
+  --gold-light: #e5c992;
+
+  --green: #2f7e49;
+
+  position: relative;
+
+  min-height: 100vh;
+
+  padding:
+    0
+    7%
+    100px;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 10% 8%,
+      rgba(228, 194, 135, 0.20) 0%,
+      rgba(228, 194, 135, 0.08) 18%,
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 92% 5%,
+      rgba(220, 190, 133, 0.13) 0%,
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      #fffdf8 0%,
+      #fbf8f2 48%,
+      #fffdf9 100%
+    );
+
+  color: var(--brown);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 }
 
 
 /* =========================================================
-   EXPLORE HEADER
+   SUBTLE PAPER TEXTURE
+   ========================================================= */
+
+.explore::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 0;
+
+  pointer-events: none;
+
+  opacity: 0.55;
+
+  background-image:
+    radial-gradient(
+      circle at 20% 30%,
+      rgba(124, 86, 48, 0.035) 0 1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at 70% 65%,
+      rgba(124, 86, 48, 0.025) 0 1px,
+      transparent 1px
+    );
+
+  background-size:
+    17px 17px,
+    23px 23px;
+}
+
+
+/* =========================================================
+   DECORATIVE BOTANICAL LEFT
+   ========================================================= */
+
+.explore::after {
+  content: "";
+
+  position: absolute;
+
+  z-index: 0;
+
+  top: -30px;
+  left: -80px;
+
+  width: 390px;
+  height: 330px;
+
+  pointer-events: none;
+
+  opacity: 0.42;
+
+  transform: rotate(-8deg);
+
+  background:
+    linear-gradient(
+      62deg,
+      transparent 47%,
+      rgba(205, 157, 84, 0.22) 48%,
+      rgba(205, 157, 84, 0.22) 49%,
+      transparent 50%
+    ),
+    linear-gradient(
+      112deg,
+      transparent 48%,
+      rgba(205, 157, 84, 0.16) 49%,
+      transparent 50%
+    );
+
+  border-radius: 50%;
+}
+
+
+/* =========================================================
+   EVERYTHING ABOVE DECORATION
+   ========================================================= */
+
+.explore > * {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   HEADER
    ========================================================= */
 
 .explore-header {
+  position: relative;
+
+  width: calc(100% + 14%);
+
+  margin-left: -7%;
+
+  margin-bottom: 0;
+
+  padding:
+    30px
+    20px
+    30px;
+
   text-align: center;
-  max-width: 700px;
-  margin: 0 auto 48px;
+
+  overflow: hidden;
+
+  border-bottom:
+    1px solid
+    rgba(116, 82, 50, 0.13);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 253, 248, 0.98),
+      rgba(255, 250, 241, 0.90)
+    );
 }
 
-.explore-header .section-label {
-  color: #a28a6c;
-  font-size: 12px;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  font-weight: 500;
+
+/* Decorative glow */
+
+.explore-header::before {
+  content: "";
+
+  position: absolute;
+
+  width: 330px;
+  height: 330px;
+
+  left: -160px;
+  top: -180px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(224, 185, 117, 0.14);
+
+  pointer-events: none;
 }
 
-.explore-header h1 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 52px;
-  font-weight: 400;
-  margin: 15px 0 12px;
-  color: #171717;
-  line-height: 1.1;
-}
 
-.explore-header p {
-  color: #6b625b;
-  font-size: 17px;
-  line-height: 1.7;
-  margin: 0;
+/* Right botanical suggestion */
+
+.explore-header::after {
+  content: "✽";
+
+  position: absolute;
+
+  right: 14%;
+
+  top: 20px;
+
+  color:
+    rgba(198, 150, 77, 0.18);
+
+  font-size: 90px;
+
+  font-weight: 300;
+
+  transform:
+    rotate(20deg);
+
+  pointer-events: none;
 }
 
 
 /* =========================================================
-   SEARCH + CATEGORY
+   SECTION LABEL
+   ========================================================= */
+
+.explore-header .section-label {
+  position: relative;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  color:
+    #4d3427;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  letter-spacing: 4px;
+
+  text-transform: uppercase;
+}
+
+
+/* Lines around label */
+
+.explore-header .section-label::before,
+.explore-header .section-label::after {
+  content: "";
+
+  width: 52px;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #d8b97e
+    );
+}
+
+.explore-header .section-label::after {
+  background:
+    linear-gradient(
+      90deg,
+      #d8b97e,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   SMALL GOLD ORNAMENT
+   ========================================================= */
+
+.explore-header .section-label::after {
+  position: relative;
+}
+
+
+/* =========================================================
+   MAIN TITLE
+   ========================================================= */
+
+.explore-header h1 {
+  position: relative;
+
+  margin:
+    15px
+    0
+    10px;
+
+  color:
+    #362218;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      42px,
+      5vw,
+      68px
+    );
+
+  font-weight: 400;
+
+  line-height: 1.05;
+
+  letter-spacing:
+    -1.8px;
+}
+
+
+/* =========================================================
+   TITLE GOLD ORNAMENT
+   ========================================================= */
+
+.explore-header h1::after {
+  content: "✦";
+
+  display: block;
+
+  margin-top: 8px;
+
+  color:
+    #c9974d;
+
+  font-size: 19px;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   HEADER DESCRIPTION
+   ========================================================= */
+
+.explore-header p {
+  position: relative;
+
+  max-width: 720px;
+
+  margin:
+    2px
+    auto
+    0;
+
+  color:
+    #71594b;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 17px;
+
+  line-height: 1.7;
+}
+
+.explore-header p strong {
+  color:
+    var(--wine);
+}
+
+
+/* =========================================================
+   CONTROLS AREA
    ========================================================= */
 
 .explore-controls {
+  position: relative;
+
+  width: 100%;
+
+  max-width: 1080px;
+
+  margin:
+    22px
+    auto
+    18px;
+
   display: flex;
-  flex-direction: column;
+
   align-items: center;
-  gap: 20px;
-  margin-bottom: 48px;
+
+  justify-content: center;
+
+  gap: 24px;
 }
 
 
 /* =========================================================
-   BEAUTIFUL PURCHASE INFORMATION CARD
+   SEARCH BAR WRAPPER
+   ========================================================= */
+
+.explore-controls > *:first-child {
+  flex:
+    1
+    1
+    520px;
+
+  max-width: 520px;
+}
+
+
+/* =========================================================
+   PURCHASE INFORMATION
    ========================================================= */
 
 .purchase-info {
   position: relative;
 
   width: 100%;
-  max-width: 1050px;
 
-  margin: 0 auto 65px;
+  max-width: 1120px;
+
+  margin:
+    12px
+    auto
+    22px;
 
   display: flex;
+
   align-items: center;
-  gap: 24px;
 
-  padding: 25px 28px;
+  gap: 26px;
 
-  box-sizing: border-box;
-
-  background:
-    linear-gradient(
-      135deg,
-      #fffdf9 0%,
-      #fff8f1 100%
-    );
-
-  border: 1px solid rgba(139, 30, 63, 0.15);
-
-  border-radius: 20px;
-
-  box-shadow:
-    0 10px 30px rgba(70, 35, 20, 0.07),
-    0 2px 8px rgba(70, 35, 20, 0.04);
+  padding:
+    23px
+    30px;
 
   overflow: hidden;
 
+  border:
+    1px solid
+    rgba(116, 31, 56, 0.12);
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      110deg,
+      #fffdf9 0%,
+      #fff8ef 60%,
+      #fdf2e7 100%
+    );
+
+  box-shadow:
+    0 15px 38px
+      rgba(72, 46, 29, 0.075),
+    0 2px 8px
+      rgba(72, 46, 29, 0.035);
+
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
 }
 
 
-/* Decorative maroon line */
+/* Burgundy vertical line */
 
 .purchase-info::before {
   content: "";
@@ -110,92 +489,103 @@
   left: 0;
   top: 0;
 
-  width: 5px;
+  width: 6px;
   height: 100%;
 
-  background: linear-gradient(
-    to bottom,
-    #8b1e3f,
-    #b76e79
-  );
+  background:
+    linear-gradient(
+      180deg,
+      #7d1f38,
+      #a83c57
+    );
 }
 
 
-/* Soft decorative circle */
+/* Decorative right leaf */
 
 .purchase-info::after {
-  content: "";
+  content: "⌁";
 
   position: absolute;
 
-  width: 150px;
-  height: 150px;
+  right: 80px;
+  bottom: -35px;
 
-  right: -65px;
-  top: -70px;
+  color:
+    rgba(201, 154, 80, 0.15);
 
-  border-radius: 50%;
+  font-size: 130px;
 
-  background: rgba(139, 30, 63, 0.045);
+  transform:
+    rotate(-25deg);
 
   pointer-events: none;
 }
 
 
 .purchase-info:hover {
-  transform: translateY(-3px);
+  transform:
+    translateY(-3px);
 
   box-shadow:
-    0 15px 40px rgba(70, 35, 20, 0.10),
-    0 3px 10px rgba(70, 35, 20, 0.05);
+    0 20px 45px
+      rgba(72, 46, 29, 0.10);
 }
 
 
 /* =========================================================
-   SHOPPING BAG ICON
+   PURCHASE ICON
    ========================================================= */
 
 .purchase-info-icon {
   position: relative;
+
   z-index: 2;
 
-  width: 58px;
-  height: 58px;
+  width: 68px;
+  height: 68px;
 
-  min-width: 58px;
+  min-width: 68px;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  background: #191919;
+  border-radius: 50%;
 
-  color: #ffffff;
+  background:
+    linear-gradient(
+      145deg,
+      #7f2039,
+      #65172d
+    );
 
-  border-radius: 16px;
+  color: white;
 
   box-shadow:
-    0 8px 18px rgba(25, 25, 25, 0.15);
+    0 10px 22px
+      rgba(101, 23, 45, 0.22);
 
   transition:
-    transform 0.3s ease,
-    background 0.3s ease;
+    transform 0.3s ease;
 }
 
-
-.purchase-info:hover .purchase-info-icon {
-  transform: rotate(-4deg) scale(1.05);
-
-  background: #8b1e3f;
+.purchase-info:hover
+.purchase-info-icon {
+  transform:
+    rotate(-5deg)
+    scale(1.05);
 }
 
 
 /* =========================================================
-   PURCHASE TEXT
+   PURCHASE CONTENT
    ========================================================= */
 
 .purchase-info-content {
   position: relative;
+
   z-index: 2;
 
   flex: 1;
@@ -203,51 +593,65 @@
   min-width: 0;
 }
 
-
 .purchase-info-content h3 {
-  margin: 0 0 7px;
+  margin:
+    0
+    0
+    6px;
 
-  font-family: Georgia, "Times New Roman", serif;
+  color:
+    #342219;
 
-  font-size: 23px;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 24px;
 
   font-weight: 600;
 
-  color: #191919;
-
-  letter-spacing: -0.2px;
+  line-height: 1.2;
 }
 
-
 .purchase-info-content p {
+  max-width: 720px;
+
   margin: 0;
 
-  max-width: 650px;
+  color:
+    #705a4d;
 
-  color: #71675f;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: 15px;
 
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
-
 .purchase-info-content strong {
-  color: #8b1e3f;
+  color:
+    var(--wine);
 
   font-weight: 700;
 }
 
 
 /* =========================================================
-   LOGIN TO BUY BUTTON
+   LOGIN BUTTON
    ========================================================= */
 
 .purchase-login-btn {
   position: relative;
+
   z-index: 3;
 
   flex-shrink: 0;
+
+  min-height: 50px;
 
   display: inline-flex;
 
@@ -256,62 +660,104 @@
 
   gap: 9px;
 
-  padding: 14px 22px;
+  padding:
+    0
+    24px;
 
-  border: 1px solid #191919;
+  border:
+    1px solid
+    var(--wine);
 
-  border-radius: 11px;
+  border-radius: 10px;
 
-  background: #191919;
+  background:
+    var(--wine);
 
-  color: #ffffff;
+  color:
+    #fff;
 
-  font-family: Arial, sans-serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: 14px;
 
-  font-weight: 600;
-
-  letter-spacing: 0.2px;
+  font-weight: 700;
 
   cursor: pointer;
 
   white-space: nowrap;
 
   box-shadow:
-    0 6px 15px rgba(25, 25, 25, 0.12);
+    0 8px 18px
+      rgba(116, 31, 56, 0.18);
 
   transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
     transform 0.25s ease,
+    background 0.25s ease,
     box-shadow 0.25s ease;
 }
 
-
 .purchase-login-btn:hover {
-  background: #8b1e3f;
+  background:
+    var(--wine-dark);
 
-  border-color: #8b1e3f;
-
-  transform: translateY(-2px);
+  transform:
+    translateY(-2px);
 
   box-shadow:
-    0 9px 22px rgba(139, 30, 63, 0.22);
+    0 12px 25px
+      rgba(116, 31, 56, 0.25);
 }
 
-
 .purchase-login-btn:active {
-  transform: translateY(0);
+  transform:
+    translateY(0);
 }
 
 
 /* =========================================================
-   BOOK GRID AREA
+   BOOK GRID
    ========================================================= */
 
 .explore .book-grid {
-  margin-top: 10px;
+  position: relative;
+
+  width: 100%;
+
+  max-width: 1290px;
+
+  margin:
+    0
+    auto;
+
+  padding-top: 0;
+}
+
+
+/* =========================================================
+   BOTTOM DECORATIVE ORNAMENT
+   ========================================================= */
+
+.explore .book-grid::after {
+  content: "❧";
+
+  display: block;
+
+  width: 100%;
+
+  margin:
+    40px
+    auto
+    -55px;
+
+  text-align: center;
+
+  color:
+    rgba(193, 146, 73, 0.75);
+
+  font-size: 28px;
 }
 
 
@@ -322,22 +768,37 @@
 @media (max-width: 900px) {
 
   .explore {
-    padding: 75px 6% 90px;
+    padding:
+      0
+      5%
+      80px;
+  }
+
+  .explore-header {
+    width: calc(100% + 10%);
+
+    margin-left: -5%;
+
+    padding:
+      28px
+      18px
+      28px;
   }
 
   .explore-header h1 {
-    font-size: 46px;
+    font-size: 48px;
+  }
+
+  .explore-controls {
+    gap: 16px;
   }
 
   .purchase-info {
-    max-width: 100%;
-
-    padding: 23px;
+    padding:
+      22px
+      24px;
   }
 
-  .purchase-info-content p {
-    max-width: 500px;
-  }
 }
 
 
@@ -348,89 +809,177 @@
 @media (max-width: 650px) {
 
   .explore {
-    padding: 65px 20px 80px;
+    padding:
+      0
+      16px
+      65px;
   }
 
+
+  /* Header */
 
   .explore-header {
-    margin-bottom: 40px;
-  }
+    width:
+      calc(100% + 32px);
 
+    margin-left:
+      -16px;
+
+    padding:
+      25px
+      15px
+      27px;
+  }
 
   .explore-header .section-label {
-    font-size: 10px;
-    letter-spacing: 4px;
+    font-size: 9px;
+
+    letter-spacing:
+      3px;
   }
 
+  .explore-header .section-label::before,
+  .explore-header .section-label::after {
+    width: 28px;
+  }
 
   .explore-header h1 {
-    font-size: 38px;
+    margin-top: 12px;
+
+    font-size:
+      39px;
+
+    letter-spacing:
+      -1px;
   }
 
+  .explore-header h1::after {
+    font-size: 15px;
+
+    margin-top: 7px;
+  }
 
   .explore-header p {
-    font-size: 15px;
-  }
-
-
-  .explore-controls {
-    margin-bottom: 40px;
-  }
-
-
-  /* Purchase card */
-
-  .purchase-info {
-    margin-bottom: 45px;
-
-    padding: 24px 20px;
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    gap: 16px;
-
-    border-radius: 18px;
-  }
-
-
-  .purchase-info::before {
-    width: 100%;
-    height: 4px;
-
-    left: 0;
-    top: 0;
-  }
-
-
-  .purchase-info-icon {
-    width: 50px;
-    height: 50px;
-
-    min-width: 50px;
-
-    border-radius: 14px;
-  }
-
-
-  .purchase-info-content h3 {
-    font-size: 21px;
-  }
-
-
-  .purchase-info-content p {
     font-size: 14px;
 
     line-height: 1.65;
   }
 
 
-  .purchase-login-btn {
+  /* Controls */
+
+  .explore-controls {
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+    gap:
+      14px;
+
+    margin:
+      20px
+      auto
+      18px;
+  }
+
+  .explore-controls > *:first-child {
     width: 100%;
 
-    padding: 14px 20px;
+    max-width: none;
+
+    flex: none;
   }
+
+
+  /* Purchase */
+
+  .purchase-info {
+    flex-direction:
+      column;
+
+    align-items:
+      flex-start;
+
+    gap:
+      14px;
+
+    margin:
+      12px
+      auto
+      28px;
+
+    padding:
+      23px
+      19px;
+
+    border-radius:
+      15px;
+  }
+
+  .purchase-info::before {
+    width:
+      100%;
+
+    height:
+      4px;
+
+    top:
+      0;
+
+    left:
+      0;
+  }
+
+  .purchase-info::after {
+    right:
+      -30px;
+
+    bottom:
+      -45px;
+  }
+
+  .purchase-info-icon {
+    width:
+      55px;
+
+    height:
+      55px;
+
+    min-width:
+      55px;
+  }
+
+  .purchase-info-content h3 {
+    font-size:
+      21px;
+  }
+
+  .purchase-info-content p {
+    font-size:
+      13px;
+
+    line-height:
+      1.65;
+  }
+
+  .purchase-login-btn {
+    width:
+      100%;
+
+    min-height:
+      47px;
+  }
+
+
+  /* Grid */
+
+  .explore .book-grid {
+    width:
+      100%;
+  }
+
 }
 
 
@@ -440,15 +989,53 @@
 
 @media (max-width: 400px) {
 
+  .explore {
+    padding-left:
+      11px;
+
+    padding-right:
+      11px;
+  }
+
+  .explore-header {
+    width:
+      calc(100% + 22px);
+
+    margin-left:
+      -11px;
+  }
+
   .explore-header h1 {
-    font-size: 34px;
+    font-size:
+      34px;
+  }
+
+  .explore-header p {
+    font-size:
+      13px;
   }
 
   .purchase-info {
-    padding: 22px 17px;
+    padding:
+      22px
+      16px;
   }
 
-  .purchase-info-content h3 {
-    font-size: 20px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .explore *,
+  .explore *::before,
+  .explore *::after {
+    animation: none !important;
+
+    transition: none !important;
   }
+
 }

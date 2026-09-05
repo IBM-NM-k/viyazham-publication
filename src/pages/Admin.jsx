@@ -520,7 +520,7 @@ function Admin() {
                       style={{
                         width: "110px",
                         height: "150px",
-                        objectFit: "cover",
+                        objectFit: "contain",
                         borderRadius: "10px",
                         flexShrink: 0,
                         background: "#eee9e1",
