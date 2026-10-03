@@ -1,5 +1,7 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import "./UserAuth.css";
 
 import {
@@ -212,8 +214,11 @@ function UserAuth() {
       setMessage("");
       setGoogleLoading(true);
 
+      // IMPORTANT:
+      // Vercel production callback.
+      // Do NOT add /viyazham-publication here.
       const redirectUrl =
-        `${window.location.origin}/viyazham-publication/auth/callback`;
+        `${window.location.origin}/auth/callback`;
 
       console.log("Google redirect URL:", redirectUrl);
 
@@ -233,8 +238,9 @@ function UserAuth() {
         throw googleError;
       }
 
-      // Google will redirect the browser to Google.
+      // Google redirects the browser automatically.
       // AuthCallback.jsx handles the final navigation.
+
     } catch (err) {
       console.error("Google login error:", err);
 
@@ -265,8 +271,10 @@ function UserAuth() {
     try {
       setForgotLoading(true);
 
+      // IMPORTANT:
+      // Vercel production reset-password route.
       const redirectUrl =
-        `${window.location.origin}/viyazham-publication/reset-password`;
+        `${window.location.origin}/reset-password`;
 
       const {
         error: resetError,
@@ -284,6 +292,7 @@ function UserAuth() {
       setMessage(
         "Password reset link has been sent to your email."
       );
+
     } catch (err) {
       console.error(
         "Forgot password error:",
@@ -294,6 +303,7 @@ function UserAuth() {
         err?.message ||
           "Unable to send password reset email."
       );
+
     } finally {
       setForgotLoading(false);
     }
@@ -461,6 +471,7 @@ function UserAuth() {
                 height="20"
                 viewBox="0 0 24 24"
               >
+
                 <path
                   fill="#4285F4"
                   d="M21.35 12.23c0-.79-.07-1.55-.2-2.27H12v4.3h5.23a4.47 4.47 0 0 1-1.94 2.93v2.44h3.14c1.84-1.69 2.92-4.18 2.92-7.4z"
@@ -480,6 +491,7 @@ function UserAuth() {
                   fill="#EA4335"
                   d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.83 3.43 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.39l3.24 2.52C7.31 8.1 9.46 6.38 12 6.38z"
                 />
+
               </svg>
             )}
 
