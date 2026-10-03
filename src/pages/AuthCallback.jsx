@@ -9,21 +9,46 @@ function AuthCallback() {
 
   useEffect(() => {
     const finishLogin = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      try {
+        // Get OAuth code from the URL
+        const code = new URLSearchParams(window.location.search).get("code");
 
-      if (!session?.user) {
+        if (!code) {
+          console.error("OAuth code not found in URL.");
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        // Exchange OAuth code for Supabase session
+        const { data, error } =
+          await supabase.auth.exchangeCodeForSession(code);
+
+        if (error) {
+          console.error("OAuth session exchange error:", error);
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        const session = data?.session;
+
+        if (!session?.user) {
+          console.error("No user session found after OAuth login.");
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        const email = session.user.email?.trim().toLowerCase();
+
+        console.log("Google login successful:", email);
+
+        if (email === ADMIN_EMAIL.toLowerCase()) {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/userdashboard", { replace: true });
+        }
+      } catch (error) {
+        console.error("Authentication callback error:", error);
         navigate("/login", { replace: true });
-        return;
-      }
-
-      const email = session.user.email?.trim().toLowerCase();
-
-      if (email === ADMIN_EMAIL.toLowerCase()) {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/userdashboard", { replace: true });
       }
     };
 

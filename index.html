@@ -8,6 +8,16 @@
       content="Viyazham Publication - Discover, explore and read books online."
     />
     <meta name="google-site-verification" content="pL1WYw0AjZe8p3ZljOniPMkv6zUh2G232jR2z_LQEHc" />
+    <script>
+  (function () {
+    const redirect = sessionStorage.redirect;
+
+    if (redirect) {
+      delete sessionStorage.redirect;
+      history.replaceState(null, null, redirect);
+    }
+  })();
+</script>
     <title>Viyazham Publication</title>
   </head>
 
